@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 using ServiceStack.ServiceHost;
+using Forum.Models;
 
-namespace Forum.Dtos
+namespace Forum.Dtos.Common
 {
     [Route("/hello")]
     [Route("/hello/{Name}")]
@@ -17,5 +14,29 @@ namespace Forum.Dtos
     public class HelloResponse
     {
         public string Result { get; set; }
+    }
+
+    [Route("/clear/")]
+    public class Clear
+    {
+
+    }
+
+    [DataContract]
+    public class ClearResponse : BaseResponse<string>
+    {
+
+    }
+
+    [Route("/status/")]
+    public class Status
+    {
+
+    }
+
+    [DataContract]
+    public class StatusResponse : BaseResponse<StatusResponseModel>
+    {
+
     }
 }

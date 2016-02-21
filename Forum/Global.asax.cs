@@ -11,10 +11,10 @@ namespace Forum
 {
     public class Global : System.Web.HttpApplication
     {
-        public class HelloAppHost : AppHostBase
+        public class ForumAppHost : AppHostBase
         {
             //Tell Service Stack the name of your application and where to find your web services
-            public HelloAppHost() : base("Hello Web Services", typeof(HelloService).Assembly) { }
+            public ForumAppHost() : base("Forum Web Services", typeof(HelloService).Assembly) { }
 
             public override void Configure(Funq.Container container)
             {
@@ -26,7 +26,7 @@ namespace Forum
         //Initialize your application singleton
         protected void Application_Start(object sender, EventArgs e)
         {
-            new HelloAppHost().Init();
+            new ForumAppHost().Init();
         }
     }
 }
