@@ -152,7 +152,10 @@
     <Compile Include="Models\BaseForumResponseModel.cs" />
     <Compile Include="Models\CreateForumResponseModel.cs" />
     <Compile Include="Models\DetailsForumResponseModel.cs" />
+    <Compile Include="Models\ForumModel.cs" />
+    <Compile Include="Models\PostModel.cs" />
     <Compile Include="Models\StatusResponseModel.cs" />
+    <Compile Include="Models\ThreadModel.cs" />
     <Compile Include="Models\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CommonService.cs" />

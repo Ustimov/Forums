@@ -5,5 +5,6 @@ namespace Forum.Models
     [DataContract]
     public class DetailsForumResponseModel : BaseForumResponseModel<UserModel>
     {
+
     }
 }
