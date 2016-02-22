@@ -63,9 +63,9 @@ namespace Forum.Services
             return new ListPostsResponse
             {
                 Code = 0,
-                Response = new List<PostModel>
+                Response = new List<PostModel<ThreadModel<string>, ForumModel>>
                 {
-                    new PostModel
+                    new PostModel<ThreadModel<string>, ForumModel>
                     {
                         Date = new DateTime(),
                         Dislikes = 0,

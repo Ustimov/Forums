@@ -1,6 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using ServiceStack.ServiceHost;
 using Forum.Models;
+using Forum.Dtos.Base;
 
 namespace Forum.Dtos.Common
 {

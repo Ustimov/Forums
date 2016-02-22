@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ServiceStack.ServiceHost;
 using Forum.Models;
+using Forum.Dtos.Base;
 
 namespace Forum.Dtos.Forum
 {
@@ -46,30 +47,6 @@ namespace Forum.Dtos.Forum
 
     }
 
-    public class BaseList
-    {
-        // Optional
-        [DataMember(Name = "since")]
-        public DateTime Since { get; set; }
-
-        // Optional
-        [DataMember(Name = "limit")]
-        public int Limit { get; set; }
-
-        // Optional
-        // Possible values: ['desc', 'asc']. Default: 'desc'
-        [DataMember(Name = "order")]
-        public string Order { get; set; } = "desc";
-
-        // Optional
-        [DataMember(Name = "related")]
-        public List<string> Related { get; set; }
-
-        // Required
-        [DataMember(Name = "forum")]
-        public string Forum { get; set; }
-    }
-
     [Route("/forum/listPosts/")]
     [DataContract]
     public class ListPosts : BaseList
@@ -78,7 +55,7 @@ namespace Forum.Dtos.Forum
     }
 
     [DataContract]
-    public class ListPostsResponse : BaseResponse<List<PostModel>>
+    public class ListPostsResponse : BaseResponse<List<PostModel<ThreadModel<string>, ForumModel>>>
     {
 
     }
