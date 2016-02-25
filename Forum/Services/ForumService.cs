@@ -44,9 +44,9 @@ namespace Forum.Services
                     {
                         About = "hello im user2",
                         Email = "example2@mail.ru",
-                        Followers = new List<UserModel>(),
-                        Following = new List<UserModel>(),
-                        Subscriptions = new List<UserModel>(),
+                        Followers = new List<string>(),
+                        Following = new List<string>(),
+                        Subscriptions = new List<int>(),
                         Id = 3,
                         IsAnonymous = false,
                         Name = "Jey",
@@ -153,12 +153,12 @@ namespace Forum.Services
                     {
                         About = null,
                         Email = "richard.nixon@example.com",
-                        Followers = new List<UserModel>(),
-                        Following = new List<UserModel>(),
+                        Followers = new List<string>(),
+                        Following = new List<string>(),
                         Id = 2,
                         IsAnonymous = true,
                         Name = null,
-                        Subscriptions = new List<UserModel>(),
+                        Subscriptions = new List<int>(),
                         Username = null,
                     }
                 }

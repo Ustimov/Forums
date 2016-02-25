@@ -14,11 +14,11 @@ namespace Forum.Models
         
         [DataMember(Name = "followers")]
         // TODO: Correct model?
-        public List<UserModel> Followers { get; set; }
+        public List<string> Followers { get; set; }
 
         [DataMember(Name = "following")]
         // TODO: Correct model?
-        public List<UserModel> Following { get; set; }
+        public List<string> Following { get; set; }
 
         [DataMember(Name = "id")]
         public int Id { get; set; }
@@ -31,7 +31,7 @@ namespace Forum.Models
 
         [DataMember(Name = "subscriptions")]
         // TODO: Correct model?
-        public List<UserModel> Subscriptions { get; set; }
+        public List<int> Subscriptions { get; set; }
 
         [DataMember(Name = "username")]
         public string Username { get; set; }
