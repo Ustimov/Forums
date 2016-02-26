@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using ServiceStack.ServiceHost;
 using Forum.Dtos.Base;
@@ -103,7 +100,6 @@ namespace Forum.Dtos.User
     }
 
     [Route("/user/updateProfile/")]
-
     [DataContract]
     public class UpdateProfile : UserModel
     {

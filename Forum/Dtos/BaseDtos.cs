@@ -67,4 +67,18 @@ namespace Forum.Dtos.Base
         [DataMember(Name = "followee")]
         public string Followee { get; set; }
     }
+
+    [DataContract]
+    public class BaseThread
+    {
+        [DataMember(Name = "thread")]
+        public int Thread { get; set; }
+    }
+
+    [DataContract]
+    public class BaseSubscribe : BaseThread
+    {
+        [DataMember(Name = "user")]
+        public string User { get; set; }
+    }
 }

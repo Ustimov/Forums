@@ -4,7 +4,7 @@ using System.Runtime.Serialization;
 namespace Forum.Models
 {
     [DataContract]
-    public class ThreadModel<T>
+    public class ThreadModel<TForum>
     {
         [IgnoreDataMember]
         public DateTime Date { get; set; }
@@ -20,7 +20,7 @@ namespace Forum.Models
         public int Dislikes { get; set; }
 
         [DataMember(Name = "forum")]
-        public T Forum { get; set; }
+        public TForum Forum { get; set; }
 
         [DataMember(Name = "id")]
         public int Id { get; set; }
