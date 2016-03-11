@@ -34,6 +34,7 @@ namespace Forum.Services
         // TODO: Post
         public object Any(Clear request)
         {
+            ConnectionProvider.DbConnection.Execute("delete from User");
             return new ClearResponse { Response = "OK", Code = 0 };
         }
 

@@ -6,6 +6,10 @@ using System.Web.Security;
 using System.Web.SessionState;
 using ServiceStack.WebHost.Endpoints;
 using Forum.Services;
+using ServiceStack.Common.Web;
+using ServiceStack.ServiceHost;
+using ServiceStack.Common;
+using ServiceStack.Text;
 
 namespace Forum
 {
@@ -20,6 +24,12 @@ namespace Forum
             {
                 //register any dependencies your services use, e.g:
                 //container.Register<ICacheClient>(new MemoryCacheClient());
+                SetConfig(new EndpointHostConfig
+                {
+                    DefaultContentType = MimeTypes.Json,
+                    //EnableFeatures = Feature.All.Remove(Feature.Metadata),
+                });
+                JsConfig.IncludeNullValues = true;
             }
         }
 

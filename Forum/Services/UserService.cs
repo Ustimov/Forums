@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ServiceStack.ServiceInterface;
+using Forum.Dtos.Base;
 using Forum.Dtos.User;
 using Forum.Models;
 using Dapper;
+using MySql.Data.MySqlClient;
 
 namespace Forum.Services
 {
@@ -16,31 +18,80 @@ namespace Forum.Services
         // {"username": "user1", "about": "hello im user1", "isAnonymous": false, "name": "John", "email": "example@mail.ru"}
         public object Post(Create request)
         {
-            ConnectionProvider.DbConnection.Execute(
-                @"insert into User
-                (About, Email, IsAnonymous, Name, Username)
-                values (@About, @Email, @IsAnonymous, @Name, @Username)",
-                new
-                {
-                    About = request.About,
-                    Email = request.Email,
-                    // Optional
-                    IsAnonymous = request.IsAnonymous,
-                    Name = request.Name,
-                    Username = request.Username,
-                });
-
-            var user = ConnectionProvider.DbConnection.Query<UserModel>(
-                @"select About, Email, IsAnonymous, Name, Username, Id
-                from User
-                where Email = @Email",
-                new { Email = request.Email });
-
-            return new CreateResponse
+            /*
+            if (string.IsNullOrEmpty(request.About) || string.IsNullOrEmpty(request.Email)
+                || string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Username))
             {
-                Code = 0,
-                Response = user.FirstOrDefault(),
-            };
+                return new CreateResponse { Code = StatusCode.IncorrectRequest };
+            }
+            */
+            try
+            {
+                if (!request.IsAnonymous)
+                {
+                    ConnectionProvider.DbConnection.Execute(
+                    @"insert into User
+                                    (About, Email, IsAnonymous, Name, Username)
+                                    values (@About, @Email, @IsAnonymous, @Name, @Username)",
+                    new
+                    {
+                        About = request.About,
+                        Email = request.Email,
+                        // Optional
+                        IsAnonymous = request.IsAnonymous,
+                        Name = request.Name,
+                        Username = request.Username,
+                    });
+                }
+                else
+                {
+                    ConnectionProvider.DbConnection.Execute(
+                    @"insert into User
+                                    (About, Email, IsAnonymous, Name, Username)
+                                    values (@About, @Email, @IsAnonymous, @Name, @Username)",
+                    new
+                    {
+                        About = "Lal",
+                        Email = request.Email,
+                        // Optional
+                        IsAnonymous = request.IsAnonymous,
+                        Name = "Lal",
+                        Username = "Lal",
+                    });
+                }
+
+                var user = ConnectionProvider.DbConnection.Query<UserModel>(
+                    @"select About, Email, IsAnonymous, Name, Username, Id
+                    from User
+                    where Email = @Email",
+                    new { Email = request.Email }).LastOrDefault();
+
+                user.Subscriptions = new List<int>();
+                user.Followers = new List<string>();
+                user.Following = new List<string>();
+
+                return new CreateResponse
+                {
+                    Code = 0,
+                    Response = user,
+                };
+
+            }
+            catch (MySqlException e)
+            {
+                if (e.Number == 1062)
+                {
+                    return new BaseResponse<string> { Code = (int)StatusCode.UserAlreadyExists, Response = e.Message };
+                }
+                else if (e.Number == 1048)
+                {
+                    return new BaseResponse<string> { Code = (int)StatusCode.IncorrectRequest, Response = e.Message };
+                }
+                else
+                {
+                    return new BaseResponse<string> { Code = (int)StatusCode.UndefinedError, Response = e.Message };
+                }
+            }
         }
 
         // Get user details
@@ -48,12 +99,37 @@ namespace Forum.Services
         public object Get(Details request)
         {
             var user = ConnectionProvider.DbConnection.Query<UserModel>(
-                @"select * from User where Email = @Email", new { Email = request.User });
+                @"select * from User where Email = @Email", new { Email = request.User }).FirstOrDefault();
+
+            if (user == null)
+            {
+                return new BaseResponse<string> { Code = (int)StatusCode.ObjectNotFound, Response = "User not found" };
+            }
+            else if (user.IsAnonymous)
+            {
+                return new CreateResponse
+                {
+                    Code = (int)StatusCode.Ok,
+                    Response = new UserModel
+                    {
+                        IsAnonymous = true,
+                        Email = user.Email,
+                        Id = user.Id,
+                        Subscriptions = new List<int>(),
+                        Followers = new List<string>(),
+                        Following = new List<string>(),
+                    }
+                };
+            }
+
+            user.Subscriptions = new List<int>();
+            user.Followers = new List<string>();
+            user.Following = new List<string>();
 
             return new DetailsResponse
             {
                 Code = 0,
-                Response = user.FirstOrDefault(),
+                Response = user,
                 /*new UserModel
                 {
                     About = "hello im user1",

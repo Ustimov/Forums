@@ -17,7 +17,7 @@ namespace Forum.Dtos.Common
         public string Result { get; set; }
     }
 
-    [Route("/clear/")]
+    [Route("/db/api/clear/")]
     public class Clear
     {
 
