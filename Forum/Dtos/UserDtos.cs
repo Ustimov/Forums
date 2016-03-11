@@ -103,7 +103,8 @@ namespace Forum.Dtos.User
     [DataContract]
     public class UpdateProfile : UserModel
     {
-
+        [DataMember(Name="user")]
+        public override string Email { get; set; }
     }
 
     [DataContract]

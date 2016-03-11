@@ -171,52 +171,17 @@ namespace Forum.Services
             };
         }
 
-        // Update profile
-        // {"about": "Wowowowow!!!", "user": "example3@mail.ru", "name": "NewName2"}
         public object Post(UpdateProfile request)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(@"update User
-                set About=@About, Name=@Name
-                where Email=@Email",
-                new { About = request.About, Name = request.Name, Email = request.Email });
+                UserCrud.Update(request);
 
-                return new UpdateProfileResponse
-                {
-                    Code = 0,
-                    Response = new UserModel
-                    {
-                        About = "hello im user1",
-                        Email = "example@mail.ru",
-                        Id = 1,
-                        IsAnonymous = false,
-                        Username = "user1",
-                        Name = "John",
-                        Subscriptions = new List<int> { 4 },
-                        Followers = new List<string> { "example3@mail.ru" },
-                        Following = new List<string> { "example3@mail.ru" }
-                    },
-                };
+                return new UpdateProfileResponse { Code = StatusCode.Ok, Response = UserCrud.Read(request.Email) };
             }
             catch(MySqlException e)
             {
-                return new UpdateProfileResponse
-                {
-                    Code = 0,
-                    Response = new UserModel
-                    {
-                        About = "hello im user1",
-                        Email = "example@mail.ru",
-                        Id = 1,
-                        IsAnonymous = false,
-                        Username = "user1",
-                        Name = "John",
-                        Subscriptions = new List<int> { 4 },
-                        Followers = new List<string> { "example3@mail.ru" },
-                        Following = new List<string> { "example3@mail.ru" }
-                    },
-                };
+                return ErrorResponse.Generate(e);
             }
         }
     }

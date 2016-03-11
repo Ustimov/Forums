@@ -10,7 +10,7 @@ namespace Forum.Models
         public string About { get; set; }
 
         [DataMember(Name = "email")]
-        public string Email { get; set; }
+        public virtual string Email { get; set; }
 
         [DataMember(Name = "followers")]
         // TODO: Correct model?

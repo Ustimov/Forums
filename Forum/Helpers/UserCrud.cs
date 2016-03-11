@@ -31,12 +31,19 @@ namespace Forum.Helpers
                 new { Email = email })
                 .FirstOrDefault();
             
-            if (user.IsAnonymous)
+            if (user != null && user.IsAnonymous)
             {
                 user.About = user.Name = user.Username = null;
             }
 
             return user;
+        }
+
+        public static void Update(UserModel user)
+        { 
+            ConnectionProvider.DbConnection.Execute(
+                @"update User set About=@About, Name=@Name where Email=@Email",
+                new { About = user.About, Name = user.Name, Email = user.Email });
         }
     }
 }
