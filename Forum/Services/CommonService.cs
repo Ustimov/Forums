@@ -5,13 +5,25 @@ using System.Web;
 using ServiceStack.ServiceInterface;
 using Forum.Models;
 using Forum.Dtos.Common;
+using Dapper;
 
 namespace Forum.Services
 {
     public class HelloService : Service
     {
+        class Obj
+        {
+            int id;
+            int Value { get; set; }
+            int? val;
+        }
+
         public object Any(Hello request)
         {
+            var connection = ConnectionProvider.DbConnection;
+
+            var result = connection.Query<Obj>("select * from T");
+
             return new HelloResponse { Result = "Hello, " + request.Name };
         }
     }

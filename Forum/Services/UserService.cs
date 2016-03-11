@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ServiceStack.ServiceInterface;
 using Forum.Dtos.User;
 using Forum.Models;
+using Dapper;
 
 namespace Forum.Services
 {
@@ -15,18 +16,30 @@ namespace Forum.Services
         // {"username": "user1", "about": "hello im user1", "isAnonymous": false, "name": "John", "email": "example@mail.ru"}
         public object Post(Create request)
         {
-            return new CreateResponse
-            {
-                Code = 0,
-                Response = new UserModel
+            ConnectionProvider.DbConnection.Execute(
+                @"insert into User
+                (About, Email, IsAnonymous, Name, Username)
+                values (@About, @Email, @IsAnonymous, @Name, @Username)",
+                new
                 {
                     About = request.About,
                     Email = request.Email,
-                    Id = 1,
+                    // Optional
                     IsAnonymous = request.IsAnonymous,
-                    Username = request.Username,
                     Name = request.Name,
-                },
+                    Username = request.Username,
+                });
+
+            var user = ConnectionProvider.DbConnection.Query<UserModel>(
+                @"select About, Email, IsAnonymous, Name, Username, Id
+                from User
+                where Email = @Email",
+                new { Email = request.Email });
+
+            return new CreateResponse
+            {
+                Code = 0,
+                Response = user.FirstOrDefault(),
             };
         }
 
@@ -34,10 +47,14 @@ namespace Forum.Services
         // user/details/?user=example%40mail.ru:
         public object Get(Details request)
         {
+            var user = ConnectionProvider.DbConnection.Query<UserModel>(
+                @"select * from User where Email = @Email", new { Email = request.User });
+
             return new DetailsResponse
             {
                 Code = 0,
-                Response = new UserModel
+                Response = user.FirstOrDefault(),
+                /*new UserModel
                 {
                     About = "hello im user1",
                     Email = "example@mail.ru",
@@ -49,6 +66,7 @@ namespace Forum.Services
                     Followers = new List<string> { "example3@mail.ru" },
                     Following = new List<string> { "example3@mail.ru" }
                 },
+                */
             };
         }
 
