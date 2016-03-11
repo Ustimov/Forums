@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Forum
 {
+    [Flags]
     public enum StatusCode
     {
         Ok = 0,

@@ -9,141 +9,42 @@ using Forum.Dtos.User;
 using Forum.Models;
 using Dapper;
 using MySql.Data.MySqlClient;
+using Forum.Helpers;
 
 namespace Forum.Services
 {
     public class UserService : Service
     {
-        // Create new user
-        // {"username": "user1", "about": "hello im user1", "isAnonymous": false, "name": "John", "email": "example@mail.ru"}
         public object Post(Create request)
         {
-            /*
-            if (string.IsNullOrEmpty(request.About) || string.IsNullOrEmpty(request.Email)
-                || string.IsNullOrEmpty(request.Name) || string.IsNullOrEmpty(request.Username))
-            {
-                return new CreateResponse { Code = StatusCode.IncorrectRequest };
-            }
-            */
             try
             {
-                if (!request.IsAnonymous)
-                {
-                    ConnectionProvider.DbConnection.Execute(
-                    @"insert into User
-                                    (About, Email, IsAnonymous, Name, Username)
-                                    values (@About, @Email, @IsAnonymous, @Name, @Username)",
-                    new
-                    {
-                        About = request.About,
-                        Email = request.Email,
-                        // Optional
-                        IsAnonymous = request.IsAnonymous,
-                        Name = request.Name,
-                        Username = request.Username,
-                    });
-                }
-                else
-                {
-                    ConnectionProvider.DbConnection.Execute(
-                    @"insert into User
-                                    (About, Email, IsAnonymous, Name, Username)
-                                    values (@About, @Email, @IsAnonymous, @Name, @Username)",
-                    new
-                    {
-                        About = "Lal",
-                        Email = request.Email,
-                        // Optional
-                        IsAnonymous = request.IsAnonymous,
-                        Name = "Lal",
-                        Username = "Lal",
-                    });
-                }
-
-                var user = ConnectionProvider.DbConnection.Query<UserModel>(
-                    @"select About, Email, IsAnonymous, Name, Username, Id
-                    from User
-                    where Email = @Email",
-                    new { Email = request.Email }).LastOrDefault();
-
-                user.Subscriptions = new List<int>();
-                user.Followers = new List<string>();
-                user.Following = new List<string>();
+                UserCrud.Create(request);
 
                 return new CreateResponse
                 {
-                    Code = 0,
-                    Response = user,
+                    Code = StatusCode.Ok,
+                    Response = UserCrud.Read(request.Email),
                 };
-
             }
             catch (MySqlException e)
             {
-                if (e.Number == 1062)
-                {
-                    return new BaseResponse<string> { Code = (int)StatusCode.UserAlreadyExists, Response = e.Message };
-                }
-                else if (e.Number == 1048)
-                {
-                    return new BaseResponse<string> { Code = (int)StatusCode.IncorrectRequest, Response = e.Message };
-                }
-                else
-                {
-                    return new BaseResponse<string> { Code = (int)StatusCode.UndefinedError, Response = e.Message };
-                }
+                return ErrorResponse.Generate(e);
             }
         }
 
-        // Get user details
-        // user/details/?user=example%40mail.ru:
         public object Get(Details request)
         {
-            var user = ConnectionProvider.DbConnection.Query<UserModel>(
-                @"select * from User where Email = @Email", new { Email = request.User }).FirstOrDefault();
+            var user = UserCrud.Read(request.Email);
 
-            if (user == null)
+            if (user != null)
             {
-                return new BaseResponse<string> { Code = (int)StatusCode.ObjectNotFound, Response = "User not found" };
+                return new DetailsResponse { Code = StatusCode.Ok, Response = user };
             }
-            else if (user.IsAnonymous)
+            else
             {
-                return new CreateResponse
-                {
-                    Code = (int)StatusCode.Ok,
-                    Response = new UserModel
-                    {
-                        IsAnonymous = true,
-                        Email = user.Email,
-                        Id = user.Id,
-                        Subscriptions = new List<int>(),
-                        Followers = new List<string>(),
-                        Following = new List<string>(),
-                    }
-                };
+                return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "User not found" };
             }
-
-            user.Subscriptions = new List<int>();
-            user.Followers = new List<string>();
-            user.Following = new List<string>();
-
-            return new DetailsResponse
-            {
-                Code = 0,
-                Response = user,
-                /*new UserModel
-                {
-                    About = "hello im user1",
-                    Email = "example@mail.ru",
-                    Id = 1,
-                    IsAnonymous = false,
-                    Username = "user1",
-                    Name = "John",
-                    Subscriptions = new List<int> { 4 },
-                    Followers = new List<string> { "example3@mail.ru" },
-                    Following = new List<string> { "example3@mail.ru" }
-                },
-                */
-            };
         }
 
         // Mark one user as folowing other user
@@ -274,22 +175,49 @@ namespace Forum.Services
         // {"about": "Wowowowow!!!", "user": "example3@mail.ru", "name": "NewName2"}
         public object Post(UpdateProfile request)
         {
-            return new UpdateProfileResponse
+            try
             {
-                Code = 0,
-                Response = new UserModel
+                ConnectionProvider.DbConnection.Execute(@"update User
+                set About=@About, Name=@Name
+                where Email=@Email",
+                new { About = request.About, Name = request.Name, Email = request.Email });
+
+                return new UpdateProfileResponse
                 {
-                    About = "hello im user1",
-                    Email = "example@mail.ru",
-                    Id = 1,
-                    IsAnonymous = false,
-                    Username = "user1",
-                    Name = "John",
-                    Subscriptions = new List<int> { 4 },
-                    Followers = new List<string> { "example3@mail.ru" },
-                    Following = new List<string> { "example3@mail.ru" }
-                },
-            };
+                    Code = 0,
+                    Response = new UserModel
+                    {
+                        About = "hello im user1",
+                        Email = "example@mail.ru",
+                        Id = 1,
+                        IsAnonymous = false,
+                        Username = "user1",
+                        Name = "John",
+                        Subscriptions = new List<int> { 4 },
+                        Followers = new List<string> { "example3@mail.ru" },
+                        Following = new List<string> { "example3@mail.ru" }
+                    },
+                };
+            }
+            catch(MySqlException e)
+            {
+                return new UpdateProfileResponse
+                {
+                    Code = 0,
+                    Response = new UserModel
+                    {
+                        About = "hello im user1",
+                        Email = "example@mail.ru",
+                        Id = 1,
+                        IsAnonymous = false,
+                        Username = "user1",
+                        Name = "John",
+                        Subscriptions = new List<int> { 4 },
+                        Followers = new List<string> { "example3@mail.ru" },
+                        Following = new List<string> { "example3@mail.ru" }
+                    },
+                };
+            }
         }
     }
 }

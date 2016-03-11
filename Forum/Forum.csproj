@@ -116,6 +116,8 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\ErrorResponse.cs" />
+    <Compile Include="Helpers\UserCrud.cs" />
     <Compile Include="Dtos\BaseDtos.cs" />
     <Compile Include="Dtos\CommonDtos.cs" />
     <Compile Include="Dtos\ForumDtos.cs" />

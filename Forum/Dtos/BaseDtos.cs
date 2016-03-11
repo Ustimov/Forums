@@ -8,7 +8,7 @@ namespace Forum.Dtos.Base
     public class BaseResponse<T>
     {
         [DataMember(Name = "code")]
-        public int Code { get; set; }
+        public StatusCode Code { get; set; }
 
         [DataMember(Name = "response")]
         public T Response { get; set; }
@@ -55,7 +55,7 @@ namespace Forum.Dtos.Base
     {
         // Required
         [DataMember(Name = "user")]
-        public string User { get; set; }
+        public string Email { get; set; }
     }
 
     [DataContract]

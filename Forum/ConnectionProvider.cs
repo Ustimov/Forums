@@ -12,7 +12,7 @@ namespace Forum
             get { return @"C:\Users\Ustimov\Documents\Visual Studio 2015\Projects\Forum\Forum\bin\forum.db"; }
         }
 
-        private static MySqlConnection WireUp()
+        private static MySqlConnection Connect()
         {
             var server = "localhost";
             var database = "forum";
@@ -30,7 +30,7 @@ namespace Forum
 
         public static MySqlConnection DbConnection
         {
-            get { return WireUp(); }
+            get { return Connect(); }
         }
     }
 }
