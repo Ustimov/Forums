@@ -51,7 +51,8 @@ namespace Forum.Dtos.User
     [DataContract]
     public class ListFollowers : BaseList
     {
-
+        [DataMember(Name = "user")]
+        public string Email { get; set; }
     }
 
     [DataContract]
@@ -64,7 +65,8 @@ namespace Forum.Dtos.User
     [DataContract]
     public class ListFollowing : BaseList
     {
-
+        [DataMember(Name = "user")]
+        public string Email { get; set; }
     }
 
     [DataContract]

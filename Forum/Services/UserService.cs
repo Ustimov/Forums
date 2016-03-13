@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ServiceStack.ServiceInterface;
 using Forum.Dtos.Base;
 using Forum.Dtos.User;
@@ -47,76 +44,52 @@ namespace Forum.Services
             }
         }
 
-        // Mark one user as folowing other user
-        // {"follower": "example@mail.ru", "followee": "example3@mail.ru"}
         public object Post(Follow request)
         {
-            return new FollowResponse
+            try
             {
-                Code = 0,
-                Response = new UserModel
-                {
-                    About = "hello im user1",
-                    Email = "example@mail.ru",
-                    Id = 1,
-                    IsAnonymous = false,
-                    Username = "user1",
-                    Name = "John",
-                    Subscriptions = new List<int> { 4 },
-                    Followers = new List<string> { "example3@mail.ru" },
-                    Following = new List<string> { "example3@mail.ru" }
-                },
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"insert into Follower values(@Follower, @Followee)",
+                    new { Follower = request.Follower, Followee = request.Followee });
+
+                return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = UserCrud.Read(request.Follower) };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Get followers of this user
-        // user/listFollowers/?user=example%40mail.ru&order=asc
         public object Get(ListFollowers request)
         {
-            return new ListFollowersResponse
+            try
             {
-                Code = 0,
-                Response = new List<UserModel>
+                return new BaseResponse<List<UserModel>>
                 {
-                    new UserModel
-                    {
-                        About = "hello im user1",
-                        Email = "example@mail.ru",
-                        Id = 1,
-                        IsAnonymous = false,
-                        Username = "user1",
-                        Name = "John",
-                        Subscriptions = new List<int> { 4 },
-                        Followers = new List<string> { "example3@mail.ru" },
-                        Following = new List<string> { "example3@mail.ru" }
-                    },
-                },
-            };
+                    Code = StatusCode.Ok,
+                    Response = UserCrud.ReadFollowers(request),
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Get followees of this user
-        // user/listFollowing/?limit=3&user=example3%40mail.ru&since_id=1&order=desc
         public object Get(ListFollowing request)
         {
-            return new ListFollowingResponse
+            try
             {
-                Code = 0,
-                Response = new List<UserModel>
+                return new BaseResponse<List<UserModel>>
                 {
-                    new UserModel
-                    {
-                        About = "hello im user1",
-                        Email = "example@mail.ru",
-                        Id = 1,
-                        IsAnonymous = false,
-                        Username = "user1",
-                        Name = "John",
-                        Subscriptions = new List<int> { 4 },
-                        Followers = new List<string> { "example3@mail.ru" },
-                        Following = new List<string> { "example3@mail.ru" }
-                    },
-                }
-            };
+                    Code = StatusCode.Ok,
+                    Response = UserCrud.ReadFollowing(request),
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         // Get posts from this user
@@ -149,26 +122,20 @@ namespace Forum.Services
             };
         }
 
-        // Mark one user as not folowing other user anymore
-        // {"follower": "example@mail.ru", "followee": "example3@mail.ru"}
         public object Post(Unfollow request)
         {
-            return new UnfollowResponse
+            try
             {
-                Code = 0,
-                Response = new UserModel
-                {
-                    About = "hello im user1",
-                    Email = "example@mail.ru",
-                    Id = 1,
-                    IsAnonymous = false,
-                    Username = "user1",
-                    Name = "John",
-                    Subscriptions = new List<int> { 4 },
-                    Followers = new List<string> { "example3@mail.ru" },
-                    Following = new List<string> { "example3@mail.ru" }
-                },
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"delete from Follower where Follower=@Follower and Followee=@Followee",
+                    new { Follower = request.Follower, Followee = request.Followee });
+
+                return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = UserCrud.Read(request.Follower) };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Post(UpdateProfile request)
