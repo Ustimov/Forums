@@ -8,9 +8,9 @@ using Forum.Dtos.Base;
 namespace Forum.Dtos.Forum
 {
     // All params are required
-    [Route("/forum/create/")]
+    [Route("/db/api/forum/create/")]
     [DataContract]
-    public class Create
+    public class CreateForum
     {
         [DataMember(Name = "name")]
         public string Name { get; set; }
@@ -28,9 +28,9 @@ namespace Forum.Dtos.Forum
 
     }
     
-    [Route("/forum/details/")]
+    [Route("/db/api/forum/details/")]
     [DataContract]
-    public class Details
+    public class ForumDetails
     {
         // Optional
         [DataMember(Name = "related")]
@@ -47,7 +47,7 @@ namespace Forum.Dtos.Forum
 
     }
 
-    [Route("/forum/listPosts/")]
+    [Route("/db/api/forum/listPosts/")]
     [DataContract]
     public class ListPosts : BaseList
     {
@@ -60,7 +60,7 @@ namespace Forum.Dtos.Forum
 
     }
 
-    [Route("/forum/listThreads/")]
+    [Route("/db/api/forum/listThreads/")]
     [DataContract]
     public class ListThreads : BaseList
     {
@@ -73,7 +73,7 @@ namespace Forum.Dtos.Forum
 
     }
 
-    [Route("/forum/listUsers/")]
+    [Route("/db/api/forum/listUsers/")]
     [DataContract]
     public class ListUsers
     {

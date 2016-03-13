@@ -9,7 +9,7 @@ namespace Forum.Dtos.User
 {
     [Route("/db/api/user/create/")]
     [DataContract]
-    public class Create : UserModel
+    public class CreateUser : UserModel
     {
         // isAnonymous - optional
         // Required: username, name, about, email
@@ -23,7 +23,7 @@ namespace Forum.Dtos.User
 
     [Route("/db/api/user/details/")]
     [DataContract]
-    public class Details : BaseUser
+    public class UserDetails : BaseUser
     {
 
     }

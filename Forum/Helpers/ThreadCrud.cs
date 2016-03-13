@@ -29,10 +29,18 @@ namespace Forum.Helpers
         }
 
         // TODO: related
-        public static ThreadModel<string> Read(int id)
+        public static ThreadModel<string> Read(ThreadDetails request)
         {
-            return ConnectionProvider.DbConnection.Query<ThreadModel<string>>(
-                @"select * from Thread where Id = @Id", new { Id = id }).FirstOrDefault();
+            if (request.Related == null)
+            {
+                return ConnectionProvider.DbConnection.Query<ThreadModel<string>>(
+                    @"select * from Thread where Id = @Id", new { Id = request.Thread }).FirstOrDefault();
+            }
+            else
+            {
+                return ConnectionProvider.DbConnection.Query<ThreadModel<string>>(
+                    @"select * from Thread where Id = @Id", new { Id = request.Thread }).FirstOrDefault();
+            }
         }
 
         public static int Count()

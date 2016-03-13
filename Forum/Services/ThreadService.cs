@@ -41,11 +41,11 @@ namespace Forum.Services
             }
         }
 
-        public object Get(Details request)
+        public object Get(ThreadDetails request)
         {
             try
             {
-                var thread = ThreadCrud.Read(request.Thread);
+                var thread = ThreadCrud.Read(request);
 
                 if (thread == null)
                 {

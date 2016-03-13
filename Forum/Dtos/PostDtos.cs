@@ -7,7 +7,7 @@ using Forum.Dtos.Base;
 
 namespace Forum.Dtos.Post
 {
-    [Route("/post/create/")]
+    [Route("/db/api/post/create/")]
     [DataContract]
     public class Create : PostModel<int, string>
     {
@@ -22,7 +22,7 @@ namespace Forum.Dtos.Post
 
     }
 
-    [Route("/post/details/")]
+    [Route("/db/api/post/details/")]
     [DataContract]
     public class Details
     {
@@ -42,7 +42,7 @@ namespace Forum.Dtos.Post
 
     }
 
-    [Route("/post/list/")]
+    [Route("/db/api/post/list/")]
     [DataContract]
     public class ListPosts : BaseList
     {
@@ -57,7 +57,7 @@ namespace Forum.Dtos.Post
 
     }
 
-    [Route("/post/remove/")]
+    [Route("/db/api/post/remove/")]
     [DataContract]
     public class Remove : BasePost
     {
@@ -70,7 +70,7 @@ namespace Forum.Dtos.Post
         
     }
 
-    [Route("/post/restore/")]
+    [Route("/db/api/post/restore/")]
     [DataContract]
     public class Restore : BasePost
     {
@@ -83,7 +83,7 @@ namespace Forum.Dtos.Post
 
     }
 
-    [Route("/post/update/")]
+    [Route("/db/api/post/update/")]
     [DataContract]
     public class Update : BasePost
     {
@@ -98,7 +98,7 @@ namespace Forum.Dtos.Post
 
     }
 
-    [Route("/post/vote/")]
+    [Route("/db/api/post/vote/")]
     [DataContract]
     public class Vote : BasePost
     {

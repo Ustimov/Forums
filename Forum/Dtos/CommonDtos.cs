@@ -5,18 +5,6 @@ using Forum.Dtos.Base;
 
 namespace Forum.Dtos.Common
 {
-    [Route("/hello")]
-    [Route("/hello/{Name}")]
-    public class Hello
-    {
-        public string Name { get; set; }
-    }
-
-    public class HelloResponse
-    {
-        public string Result { get; set; }
-    }
-
     [Route("/db/api/clear/")]
     public class Clear
     {
@@ -29,7 +17,7 @@ namespace Forum.Dtos.Common
 
     }
 
-    [Route("/status/")]
+    [Route("/db/api/status/")]
     public class Status
     {
 

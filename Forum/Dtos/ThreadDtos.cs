@@ -36,7 +36,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/details/")]
     [DataContract]
-    public class Details : BaseThread
+    public class ThreadDetails : BaseThread
     {
         [DataMember(Name = "related")]
         public List<string> Related { get; set; }

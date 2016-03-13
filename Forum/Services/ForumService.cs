@@ -6,54 +6,52 @@ using System.Threading.Tasks;
 using ServiceStack.ServiceInterface;
 using Forum.Models;
 using Forum.Dtos.Forum;
+using Forum.Helpers;
+using Forum.Dtos.Base;
 
 namespace Forum.Services
 {
-    // Create new forum
-    // {"name": "Forum With Sufficiently Large Name", "short_name": "forumwithsufficientlylargename", "user": "richard.nixon@example.com"}:
     public class ForumService : Service
     {
-        public object Post(Create request)
+        public object Post(CreateForum request)
         {
-            return new CreateResponse
+            try
             {
-                Code = 0,
-                Response = new CreateForumResponseModel
+                ForumCrud.Create(request);
+
+                var forum = ForumCrud.Read(new ForumDetails { Forum = request.ShortName });
+
+                if (forum != null)
                 {
-                    Id = 1,
-                    User = request.User,
-                    Name = request.Name,
-                    ShortName = request.ShortName,
+                    return new BaseResponse<ForumModel> { Code = StatusCode.Ok, Response = forum };
                 }
-            };
+
+                return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Forum not found" };
+
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
-        // Get forum details
-        // http://some.host.ru/db/api/forum/details/?related=user&forum=forum3:
-        public object Get(Details request)
+        public object Get(ForumDetails request)
         {
-            return new DetailsResponse
+            try
             {
-                Code = 0,
-                Response = new DetailsForumResponseModel
+                var forum = ForumCrud.Read(request);
+
+                if (forum != null)
                 {
-                    Id = 4,
-                    Name = "\u0424\u043e\u0440\u0443\u043c \u0422\u0440\u0438",
-                    ShortName = "forum3",
-                    User = new UserModel
-                    {
-                        About = "hello im user2",
-                        Email = "example2@mail.ru",
-                        Followers = new List<string>(),
-                        Following = new List<string>(),
-                        Subscriptions = new List<int>(),
-                        Id = 3,
-                        IsAnonymous = false,
-                        Name = "Jey",
-                        Username = "user2",
-                    }
+                    return new BaseResponse<ForumModel> { Code = StatusCode.Ok, Response = forum };
                 }
-            };
+
+                return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Forum not found" };
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
         // Get posts from this forum

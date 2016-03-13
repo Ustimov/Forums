@@ -12,7 +12,7 @@ namespace Forum.Services
 {
     public class UserService : Service
     {
-        public object Post(Create request)
+        public object Post(CreateUser request)
         {
             try
             {
@@ -30,7 +30,7 @@ namespace Forum.Services
             }
         }
 
-        public object Get(Details request)
+        public object Get(UserDetails request)
         {
             var user = UserCrud.Read(request.Email);
 
