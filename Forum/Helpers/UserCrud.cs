@@ -41,8 +41,10 @@ namespace Forum.Helpers
                 user.About = user.Name = user.Username = null;
             }
 
+            // TODO: To additional method
             user.Followers = ReadFollowerEmails(user.Email);
             user.Following = ReadFollowingEmails(user.Email);
+            user.Subscriptions = ReadSubscriptions(user.Email);
 
             return user;
         }
@@ -65,6 +67,7 @@ namespace Forum.Helpers
             {
                 user.Followers = ReadFollowerEmails(user.Email);
                 user.Following = ReadFollowingEmails(user.Email);
+                user.Subscriptions = ReadSubscriptions(user.Email);
             }
 
             return users.ToList();
@@ -100,6 +103,18 @@ namespace Forum.Helpers
                 @"select Followee from Follower where Follower=@Email", new { Email = email });
 
             return emails.ToList();
+        }
+
+        private static List<int> ReadSubscriptions(string email)
+        {
+            return ConnectionProvider.DbConnection.Query<int>(
+                @"select Thread from Subscribe where User=@Email", new { Email = email }).
+                ToList();
+        }
+
+        public static int Count()
+        {
+            return ConnectionProvider.DbConnection.Query<int>(@"select count (*) User").FirstOrDefault();
         }
     }
 }

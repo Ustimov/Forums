@@ -18,7 +18,7 @@ namespace Forum
         public class ForumAppHost : AppHostBase
         {
             //Tell Service Stack the name of your application and where to find your web services
-            public ForumAppHost() : base("Forum Web Services", typeof(HelloService).Assembly) { }
+            public ForumAppHost() : base("Forum Web Services", typeof(CommonService).Assembly) { }
 
             public override void Configure(Funq.Container container)
             {

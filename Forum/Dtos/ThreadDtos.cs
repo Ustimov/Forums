@@ -7,7 +7,7 @@ using Forum.Models;
 
 namespace Forum.Dtos.Thread
 {
-    [Route("/thread/close/")]
+    [Route("/db/api/thread/close/")]
     [DataContract]
     public class Close : BaseThread
     {
@@ -20,9 +20,9 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/create/")]
+    [Route("/db/api/thread/create/")]
     [DataContract]
-    public class Create : ThreadModel<string>
+    public class CreateThread : ThreadModel<string>
     {
         // Optional: isDeleted
         // Required: forum, title, isClosed, user, date, message, slug
@@ -34,7 +34,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/details/")]
+    [Route("/db/api/thread/details/")]
     [DataContract]
     public class Details : BaseThread
     {
@@ -48,7 +48,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/list/")]
+    [Route("/db/api/thread/list/")]
     [DataContract]
     public class ListThreads : BaseList
     {
@@ -63,7 +63,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/listPosts/")]
+    [Route("/db/api/thread/listPosts/")]
     [DataContract]
     public class ListPosts : BaseList
     {
@@ -78,7 +78,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/open/")]
+    [Route("/db/api/thread/open/")]
     [DataContract]
     public class Open : BaseThread
     {
@@ -91,7 +91,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/remove/")]
+    [Route("/db/api/thread/remove/")]
     [DataContract]
     public class Remove : BaseThread
     {
@@ -104,7 +104,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/restore/")]
+    [Route("/db/api/thread/restore/")]
     [DataContract]
     public class Restore : BaseThread
     {
@@ -117,7 +117,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/subscribe/")]
+    [Route("/db/api/thread/subscribe/")]
     [DataContract]
     public class Subscribe : BaseSubscribe
     {
@@ -130,7 +130,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/unsubscribe/")]
+    [Route("/db/api/thread/unsubscribe/")]
     [DataContract]
     public class Unsubscribe : BaseSubscribe
     {
@@ -143,7 +143,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/update/")]
+    [Route("/db/api/thread/update/")]
     [DataContract]
     public class Update : BaseThread
     {
@@ -162,7 +162,7 @@ namespace Forum.Dtos.Thread
 
     }
 
-    [Route("/thread/vote/")]
+    [Route("/db/api/thread/vote/")]
     [DataContract]
     public class Vote : BaseThread
     {

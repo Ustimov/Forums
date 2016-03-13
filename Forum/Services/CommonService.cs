@@ -1,58 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Dapper;
 using ServiceStack.ServiceInterface;
 using Forum.Models;
 using Forum.Dtos.Common;
-using Dapper;
+using Forum.Helpers;
+using Forum.Dtos.Base;
 
 namespace Forum.Services
 {
-    public class HelloService : Service
-    {
-        class Obj
-        {
-            int id;
-            int Value { get; set; }
-            int? val;
-        }
-
-        public object Any(Hello request)
-        {
-            var connection = ConnectionProvider.DbConnection;
-
-            var result = connection.Query<Obj>("select * from T");
-
-            return new HelloResponse { Result = "Hello, " + request.Name };
-        }
-    }
-
     public class CommonService : Service
     {
-        // Truncate all tables
-        // TODO: Post
-        public object Any(Clear request)
+        public object Post(Clear request)
         {
+            ConnectionProvider.DbConnection.Execute("delete from Subscribe");
+            ConnectionProvider.DbConnection.Execute("delete from Post");
+            ConnectionProvider.DbConnection.Execute("delete from Thread");
+            ConnectionProvider.DbConnection.Execute("delete from Forum");
             ConnectionProvider.DbConnection.Execute("delete from Follower");
             ConnectionProvider.DbConnection.Execute("delete from User");
 
-            return new ClearResponse { Response = "OK", Code = 0 };
+            return new BaseResponse<string> { Code = StatusCode.Ok, Response = "Ok" };
         }
 
-        // Show status info: maps table name to number of rows in that table
-        // {"code": 0, "response": {"user": 100000, "thread": 1000, "forum": 100, "post": 1000000}}
         public object Get(Status request)
         {
-            return new StatusResponse
+            return new BaseResponse<StatusResponseModel>
             {
-                Code = 0,
+                Code = StatusCode.Ok,
                 Response = new StatusResponseModel
                 {
-                    User = 100000,
-                    Thread = 1000,
-                    Forum = 100,
-                    Post = 1000000,
+                    User = UserCrud.Count(),
+                    Thread = ThreadCrud.Count(),
+                    Forum = ForumCrud.Count(),
+                    Post = PostCrud.Count(),
                 },
             };
         }

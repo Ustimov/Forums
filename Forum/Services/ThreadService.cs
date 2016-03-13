@@ -7,6 +7,8 @@ using ServiceStack.ServiceInterface;
 using Forum.Dtos.Base;
 using Forum.Dtos.Thread;
 using Forum.Models;
+using Forum.Helpers;
+using Dapper;
 
 namespace Forum.Services
 {
@@ -26,48 +28,40 @@ namespace Forum.Services
             };
         }
 
-        // Create new thread
-        // {"forum": "forum1", "title": "Thread With Sufficiently Large Title", "isClosed": true, "user": "example3@mail.ru", "date": "2014-01-01 00:00:01", "message": "hey hey hey hey!", "slug": "Threadwithsufficientlylargetitle", "isDeleted": true}
-        public object Post(Create request)
+        public object Post(CreateThread request)
         {
-            return new CreateResponse
+            try
             {
-                Code = 0, 
-                Response = new ThreadModel<string>
-                {
-                    DateString = "2014-01-01 00:00:01",
-                    Forum = "forum1",
-                    Id = 1,
-                    IsClosed = true,
-                    IsDeleted = true,
-                    Message = "hey hey hey hey!",
-                    Slug = "Threadwithsufficientlylargetitle",
-                    Title = "Thread With Sufficiently Large Title",
-                    User = "example3@mail.ru",
-                },
-            };
+                ThreadCrud.Create(request);
+                return new BaseResponse<ThreadModel<string>> { Code = StatusCode.Ok, Response = request };
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
-        // Get thread details
-        // thread/details/?thread=1
         public object Get(Details request)
         {
-            return new DetailsResponse
+            try
             {
-                Code = 0,
-                Response = new ThreadModel<string>
+                var thread = ThreadCrud.Read(request.Thread);
+
+                if (thread == null)
                 {
-                    DateString = "2014-01-01 00:00:01",
-                    Forum = "forum1",
-                    Id = 1,
-                    IsClosed = true,
-                    IsDeleted = true,
-                    Message = "hey hey hey hey!",
-                    Slug = "Threadwithsufficientlylargetitle",
-                    Title = "Thread With Sufficiently Large Title",
-                    User = "example3@mail.ru",
-                },
-            };
+                    return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Thread not found" };
+                }
+
+                return new BaseResponse<ThreadModel<string>>
+                {
+                    Code = StatusCode.Ok,
+                    Response = thread,
+                };
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
         // List threads
@@ -166,34 +160,44 @@ namespace Forum.Services
             };
         }
 
-        // Subscribe user to this thread
-        // {"user": "richard.nixon@example.com", "thread": 4}
         public object Post(Subscribe request)
         {
-            return new SubscribeResponse
+            try
             {
-                Code = 0,
-                Response = new BaseSubscribe
+                ConnectionProvider.DbConnection.Execute(
+                    @"insert into Subscribe values (User=@User, Thread=@Thread)",
+                    new { User = request.User, Thread = request.Thread });
+
+                return new BaseResponse<BaseSubscribe>
                 {
-                    Thread = request.Thread,
-                    User = request.User,
-                }
-            };
+                    Code = StatusCode.Ok,
+                    Response = request,
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Unsubscribe user from this thread
-        // {"user": "richard.nixon@example.com", "thread": 4}
         public object Post(Unsubscribe request)
         {
-            return new UnsubscribeResponse
+            try
             {
-                Code = 0,
-                Response = new BaseSubscribe
+                ConnectionProvider.DbConnection.Execute(
+                    @"delete from Subscribe where User=@User and Thread=@Thread",
+                    new { User = request.User, Thread = request.Thread });
+
+                return new BaseResponse<BaseSubscribe>
                 {
-                    Thread = request.Thread,
-                    User = request.User,
-                }
-            };
+                    Code = StatusCode.Ok,
+                    Response = request,
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         // Edit thread
