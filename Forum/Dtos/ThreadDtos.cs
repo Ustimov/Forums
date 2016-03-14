@@ -22,14 +22,14 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/create/")]
     [DataContract]
-    public class CreateThread : ThreadModel<string>
+    public class CreateThread : ThreadModel<string, string>
     {
         // Optional: isDeleted
         // Required: forum, title, isClosed, user, date, message, slug
     }
 
     [DataContract]
-    public class CreateResponse : BaseResponse<ThreadModel<string>>
+    public class CreateResponse : BaseResponse<ThreadModel<string, string>>
     {
 
     }
@@ -43,7 +43,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class DetailsResponse : BaseResponse<ThreadModel<string>>
+    public class DetailsResponse : BaseResponse<ThreadModel<string, string>>
     {
 
     }
@@ -58,7 +58,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class ListThreadsResponse : BaseResponse<List<ThreadModel<string>>>
+    public class ListThreadsResponse : BaseResponse<List<ThreadModel<string, string>>>
     {
 
     }
@@ -157,7 +157,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class UpdateResponse : BaseResponse<ThreadModel<string>>
+    public class UpdateResponse : BaseResponse<ThreadModel<string, string>>
     {
 
     }
@@ -172,7 +172,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class VoteResponse : BaseResponse<ThreadModel<string>>
+    public class VoteResponse : BaseResponse<ThreadModel<string, string>>
     {
 
     }

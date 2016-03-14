@@ -33,7 +33,7 @@ namespace Forum.Services
             try
             {
                 ThreadCrud.Create(request);
-                return new BaseResponse<ThreadModel<string>> { Code = StatusCode.Ok, Response = request };
+                return new BaseResponse<ThreadModel<string, string>> { Code = StatusCode.Ok, Response = request };
             }
             catch(Exception e)
             {
@@ -45,17 +45,65 @@ namespace Forum.Services
         {
             try
             {
-                var thread = ThreadCrud.Read(request);
+                var thread = ThreadCrud.Read(request.Thread);
 
                 if (thread == null)
                 {
                     return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Thread not found" };
                 }
 
-                return new BaseResponse<ThreadModel<string>>
+                if (request.Related.Count == 0)
                 {
-                    Code = StatusCode.Ok,
-                    Response = thread,
+                    return new BaseResponse<ThreadModel<string, string>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = thread,
+                    };
+                }
+                else if (request.Related.Count == 2 && request.Related.Contains("user") && request.Related.Contains("forum"))
+                {
+                    return new BaseResponse<ThreadModel<ForumModel, UserModel>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = new ThreadModel<ForumModel, UserModel>(thread)
+                        {
+                            Forum = ForumCrud.Read(thread.Forum),
+                            User = UserCrud.Read(thread.User),
+                        },
+                    };
+                }
+                else if (request.Related.Count == 1)
+                {
+                    if (request.Related.Contains("forum"))
+                    {
+                        return new BaseResponse<ThreadModel<ForumModel, string>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new ThreadModel<ForumModel, string>(thread)
+                            {
+                                Forum = ForumCrud.Read(thread.Forum),
+                                User = thread.User,
+                            },
+                        };
+                    }
+                    else if (request.Related.Contains("user"))
+                    {
+                        return new BaseResponse<ThreadModel<string, UserModel>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new ThreadModel<string, UserModel>(thread)
+                            {
+                                Forum = thread.Forum,
+                                User = UserCrud.Read(thread.User),
+                            },
+                        };
+                    }
+                }
+
+                return new BaseResponse<string>
+                {
+                    Code = StatusCode.IncorrectRequest,
+                    Response = "Incorrect request",
                 };
             }
             catch(Exception e)
@@ -71,9 +119,9 @@ namespace Forum.Services
             return new ListThreadsResponse
             {
                 Code = 0,
-                Response = new List<ThreadModel<string>>
+                Response = new List<ThreadModel<string, string>>
                 {
-                    new ThreadModel<string>
+                    new ThreadModel<string, string>
                     {
                         DateString = "2014-01-01 00:00:01",
                         Forum = "forum1",
@@ -207,7 +255,7 @@ namespace Forum.Services
             return new UpdateResponse
             {
                 Code = 0,
-                Response = new ThreadModel<string>
+                Response = new ThreadModel<string, string>
                 {
                     DateString = "2014-01-01 00:00:01",
                     Forum = "forum1",
@@ -229,7 +277,7 @@ namespace Forum.Services
             return new VoteResponse
             {
                 Code = 0,
-                Response = new ThreadModel<string>
+                Response = new ThreadModel<string, string>
                 {
                     DateString = "2014-01-01 00:00:01",
                     Forum = "forum1",

@@ -30,6 +30,13 @@ namespace Forum.Helpers
                 new { ShortName = request.Forum }).FirstOrDefault();
         }
 
+        public static ForumModel Read(string shortName)
+        {
+            return ConnectionProvider.DbConnection.Query<ForumModel>(
+                @"select * from Forum where ShortName = @ShortName",
+                new { ShortName = shortName }).FirstOrDefault();
+        }
+
         public static int Count()
         {
             return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Forum").FirstOrDefault();

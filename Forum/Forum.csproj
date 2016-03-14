@@ -131,6 +131,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\BaseForumResponseModel.cs" />
+    <Compile Include="Models\BaseThreadModel.cs" />
     <Compile Include="Models\CreateForumResponseModel.cs" />
     <Compile Include="Models\DetailsForumResponseModel.cs" />
     <Compile Include="Models\ForumModel.cs" />

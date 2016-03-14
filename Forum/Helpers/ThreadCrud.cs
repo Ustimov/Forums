@@ -28,21 +28,37 @@ namespace Forum.Helpers
                 });
         }
 
-        // TODO: related
-        public static ThreadModel<string> Read(ThreadDetails request)
+        public static ThreadModel<string, string> Read(int id)
         {
-            if (request.Related == null)
-            {
-                return ConnectionProvider.DbConnection.Query<ThreadModel<string>>(
-                    @"select * from Thread where Id = @Id", new { Id = request.Thread }).FirstOrDefault();
-            }
-            else
-            {
-                return ConnectionProvider.DbConnection.Query<ThreadModel<string>>(
-                    @"select * from Thread where Id = @Id", new { Id = request.Thread }).FirstOrDefault();
-            }
+            return ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+                @"select * from Thread where Id = @Id", new { Id = id }).FirstOrDefault();
         }
 
+        /*
+        public static ThreadModel<ForumModel, string> ReadWithForum(int id)
+        {
+            var thread = Read(id);
+
+            ThreadModel<ForumModel, string> threadWithForum = new ThreadModel<ForumModel, string>(thread);
+            threadWithForum.Forum = ForumCrud.Read(thread.Forum);
+
+            return threadWithForum;
+
+        }
+        
+        public static ThreadModel<string, UserModel> ReadWithUser(int id)
+        {
+            var thread = Read(id);
+
+            ThreadModel<string, UserModel> threadWithUser = new ThreadModel<string, UserModel>(thread);
+            threadWithUser.User = UserCrud.Read(thread.User);
+
+            return threadWithUser;
+        }
+
+        public static ThreadModel<ForumModel, UserModel> ReadWith
+        */
+        
         public static int Count()
         {
             return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Thread").FirstOrDefault();

@@ -61,9 +61,9 @@ namespace Forum.Services
             return new ListPostsResponse
             {
                 Code = 0,
-                Response = new List<PostModel<ThreadModel<string>, ForumModel>>
+                Response = new List<PostModel<ThreadModel<string, string>, ForumModel>>
                 {
-                    new PostModel<ThreadModel<string>, ForumModel>
+                    new PostModel<ThreadModel<string, string>, ForumModel>
                     {
                         Date = new DateTime(),
                         Dislikes = 0,
@@ -83,7 +83,7 @@ namespace Forum.Services
                         Likes = 0,
                         Message = "my message 1",
                         Points = 0,
-                        Thread = new ThreadModel<string>
+                        Thread = new ThreadModel<string, string>
                         {
                             Date = new DateTime(),
                             Dislikes = 0,
@@ -112,9 +112,9 @@ namespace Forum.Services
             return new ListThreadsResponse
             {
                 Code = 0,
-                Response = new List<ThreadModel<ForumModel>>
+                Response = new List<ThreadModel<ForumModel, string>>
                 {
-                    new ThreadModel<ForumModel>
+                    new ThreadModel<ForumModel, string>
                     {
                         Date = DateTime.Parse("2014-01-01 00:00:01"),
                         Dislikes = 0,
