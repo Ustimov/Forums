@@ -130,6 +130,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\BaseForumModel.cs" />
     <Compile Include="Models\BaseForumResponseModel.cs" />
     <Compile Include="Models\BaseThreadModel.cs" />
     <Compile Include="Models\CreateForumResponseModel.cs" />

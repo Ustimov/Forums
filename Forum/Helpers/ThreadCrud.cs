@@ -34,6 +34,24 @@ namespace Forum.Helpers
                 @"select * from Thread where Id = @Id", new { Id = id }).FirstOrDefault();
         }
 
+        public static ThreadModel<string, string> Read(CreateThread request)
+        {
+            return ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+                @"select * from Thread where Forum = @Forum and Title = @Title and IsClosed = @IsClosed and
+                User = @User and Date = @Date and Message = @Message and Slug = @Slug and IsDeleted = @IsDeleted", 
+                new
+                {
+                    Forum = request.Forum,
+                    Title = request.Title,
+                    IsClosed = request.IsClosed,
+                    User = request.User,
+                    Date = request.Date,
+                    Message = request.Message,
+                    Slug = request.Slug,
+                    IsDeleted = request.IsDeleted,
+                }).FirstOrDefault();
+        }
+
         /*
         public static ThreadModel<ForumModel, string> ReadWithForum(int id)
         {

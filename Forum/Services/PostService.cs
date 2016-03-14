@@ -7,62 +7,48 @@ using ServiceStack.ServiceInterface;
 using Forum.Dtos.Post;
 using Forum.Dtos.Base;
 using Forum.Models;
+using Forum.Helpers;
 
 namespace Forum.Services
 {
     public class PostService : Service
     {
-        // Create new post
-        // {"isApproved": true, "user": "example@mail.ru", "date": "2014-01-01 00:00:01", "message": "my message 1", "isSpam": false, "isHighlighted": true, "thread": 4, "forum": "forum2", "isDeleted": false, "isEdited": true}
-        public object Post(Create request)
+        public object Post(CreatePost request)
         {
-            return new CreateResponse
+            try
             {
-                Code = 0,
-                Response = new PostModel<int, string>
-                {
-                    Date = request.Date,
-                    Forum = request.Forum,
-                    Id = request.Id,
-                    IsApproved = request.IsApproved,
-                    IsDeleted = request.IsDeleted,
-                    IsEdited = request.IsEdited,
-                    IsHighlighted = request.IsHighlighted,
-                    IsSpam = request.IsSpam,
-                    Message = request.Message,
-                    Thread = request.Thread,
-                    User = request.User,
-                }
-            };
+                PostCrud.Create(request);
+
+                return new BaseResponse<PostModel<int, string>> { Code = StatusCode.Ok, Response = PostCrud.Read(request) };
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
-        // Get post details
-        // http://some.host.ru/db/api/post/details/?post=3
-        public object Get(Details request)
+        public object Get(PostDetails request)
         {
-            return new DetailsResponse
+            try
             {
-                Code = 0,
-                Response = new PostModel<int, string>
+                var post = PostCrud.Read(request.Post);
+
+                if (post == null)
                 {
-                    Date = DateTime.Parse("2014-01-02 00:02:01"),
-                    Dislikes = 0,
-                    Forum = "forum2",
-                    Id = 3,
-                    IsApproved = false,
-                    IsDeleted = false,
-                    IsEdited = false,
-                    IsHighlighted = false,
-                    IsSpam = false,
-                    Likes = 0,
-                    Message = "my message 1",
-                    // TODO
-                    //Parent = 2,
-                    Points = 0,
-                    Thread = 4,
-                    User = "example@mail.ru",
+                    return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Post not found" };
                 }
-            };
+
+                if (request.Related == null)
+                {
+                    return new BaseResponse<PostModel<int, string>> { Code = StatusCode.Ok, Response = post };
+                }
+
+                return new BaseResponse<string> { Code = StatusCode.IncorrectRequest, Response = "Incorrect request" };
+            }
+            catch(Exception e)
+            {
+                throw;
+            }
         }
 
         // List posts

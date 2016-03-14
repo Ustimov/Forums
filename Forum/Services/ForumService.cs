@@ -19,15 +19,11 @@ namespace Forum.Services
             {
                 ForumCrud.Create(request);
 
-                var forum = ForumCrud.Read(new ForumDetails { Forum = request.ShortName });
-
-                if (forum != null)
+                return new BaseResponse<ForumModel<string>>
                 {
-                    return new BaseResponse<ForumModel> { Code = StatusCode.Ok, Response = forum };
-                }
-
-                return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Forum not found" };
-
+                    Code = StatusCode.Ok,
+                    Response = ForumCrud.Read(request.ShortName)
+                };
             }
             catch(Exception e)
             {
@@ -39,14 +35,34 @@ namespace Forum.Services
         {
             try
             {
-                var forum = ForumCrud.Read(request);
+                var forum = ForumCrud.Read(request.Forum);
 
-                if (forum != null)
+                if (forum == null)
                 {
-                    return new BaseResponse<ForumModel> { Code = StatusCode.Ok, Response = forum };
+                    return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Forum not found" };
                 }
 
-                return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Forum not found" };
+                if (request.Related == null)
+                {
+                    return new BaseResponse<ForumModel<string>> { Code = StatusCode.Ok, Response = forum };
+                }
+                else if (request.Related.Count == 1 && request.Related.Contains("user"))
+                {
+                    return new BaseResponse<ForumModel<UserModel>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = new ForumModel<UserModel>(forum)
+                        {
+                            User = UserCrud.Read(forum.User),
+                        },
+                    };
+                }
+
+                return new BaseResponse<string>
+                {
+                    Code = StatusCode.IncorrectRequest,
+                    Response = "Incorrect request",
+                };
             }
             catch(Exception e)
             {
@@ -61,13 +77,13 @@ namespace Forum.Services
             return new ListPostsResponse
             {
                 Code = 0,
-                Response = new List<PostModel<ThreadModel<string, string>, ForumModel>>
+                Response = new List<PostModel<ThreadModel<string, string>, ForumModel<string>>>
                 {
-                    new PostModel<ThreadModel<string, string>, ForumModel>
+                    new PostModel<ThreadModel<string, string>, ForumModel<string>>
                     {
                         Date = new DateTime(),
                         Dislikes = 0,
-                        Forum = new ForumModel
+                        Forum = new ForumModel<string>
                         {
                             Id = 2,
                             Name = "Forum I",
@@ -112,13 +128,13 @@ namespace Forum.Services
             return new ListThreadsResponse
             {
                 Code = 0,
-                Response = new List<ThreadModel<ForumModel, string>>
+                Response = new List<ThreadModel<ForumModel<string>, string>>
                 {
-                    new ThreadModel<ForumModel, string>
+                    new ThreadModel<ForumModel<string>, string>
                     {
                         Date = DateTime.Parse("2014-01-01 00:00:01"),
                         Dislikes = 0,
-                        Forum = new ForumModel
+                        Forum = new ForumModel<string>
                         {
                             Id = 2,
                             Name = "Forum I",

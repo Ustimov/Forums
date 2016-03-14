@@ -23,16 +23,16 @@ namespace Forum.Helpers
         }
 
         // TODO: related
-        public static ForumModel Read(ForumDetails request)
+        public static ForumModel<string> Read(ForumDetails request)
         {
-            return ConnectionProvider.DbConnection.Query<ForumModel>(
+            return ConnectionProvider.DbConnection.Query<ForumModel<string>>(
                 @"select * from Forum where ShortName = @ShortName",
                 new { ShortName = request.Forum }).FirstOrDefault();
         }
 
-        public static ForumModel Read(string shortName)
+        public static ForumModel<string> Read(string shortName)
         {
-            return ConnectionProvider.DbConnection.Query<ForumModel>(
+            return ConnectionProvider.DbConnection.Query<ForumModel<string>>(
                 @"select * from Forum where ShortName = @ShortName",
                 new { ShortName = shortName }).FirstOrDefault();
         }

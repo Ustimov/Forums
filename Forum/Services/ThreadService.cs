@@ -33,7 +33,12 @@ namespace Forum.Services
             try
             {
                 ThreadCrud.Create(request);
-                return new BaseResponse<ThreadModel<string, string>> { Code = StatusCode.Ok, Response = request };
+
+                return new BaseResponse<ThreadModel<string, string>>
+                {
+                    Code = StatusCode.Ok,
+                    Response = ThreadCrud.Read(request)
+                };
             }
             catch(Exception e)
             {
@@ -52,7 +57,7 @@ namespace Forum.Services
                     return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Thread not found" };
                 }
 
-                if (request.Related.Count == 0)
+                if (request.Related == null)
                 {
                     return new BaseResponse<ThreadModel<string, string>>
                     {
@@ -62,10 +67,10 @@ namespace Forum.Services
                 }
                 else if (request.Related.Count == 2 && request.Related.Contains("user") && request.Related.Contains("forum"))
                 {
-                    return new BaseResponse<ThreadModel<ForumModel, UserModel>>
+                    return new BaseResponse<ThreadModel<ForumModel<string>, UserModel>>
                     {
                         Code = StatusCode.Ok,
-                        Response = new ThreadModel<ForumModel, UserModel>(thread)
+                        Response = new ThreadModel<ForumModel<string>, UserModel>(thread)
                         {
                             Forum = ForumCrud.Read(thread.Forum),
                             User = UserCrud.Read(thread.User),
@@ -76,10 +81,10 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<ThreadModel<ForumModel, string>>
+                        return new BaseResponse<ThreadModel<ForumModel<string>, string>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new ThreadModel<ForumModel, string>(thread)
+                            Response = new ThreadModel<ForumModel<string>, string>(thread)
                             {
                                 Forum = ForumCrud.Read(thread.Forum),
                                 User = thread.User,

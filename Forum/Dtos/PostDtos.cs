@@ -9,7 +9,7 @@ namespace Forum.Dtos.Post
 {
     [Route("/db/api/post/create/")]
     [DataContract]
-    public class Create : PostModel<int, string>
+    public class CreatePost : PostModel<int, string>
     {
         // Required date, thread, message, user, forum
 
@@ -24,7 +24,7 @@ namespace Forum.Dtos.Post
 
     [Route("/db/api/post/details/")]
     [DataContract]
-    public class Details
+    public class PostDetails
     {
         // Optional
         // Possible values: ['user', 'thread', 'forum']
