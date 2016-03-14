@@ -55,7 +55,8 @@ namespace Forum.Dtos.Forum
     }
 
     [DataContract]
-    public class ListPostsResponse : BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>>>>
+    public class ListPostsResponse : BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>,
+        string, int>>>
     {
 
     }

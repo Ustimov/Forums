@@ -9,7 +9,7 @@ namespace Forum.Dtos.Post
 {
     [Route("/db/api/post/create/")]
     [DataContract]
-    public class CreatePost : PostModel<int, string>
+    public class CreatePost : PostModel<int, string, string, int>
     {
         // Required date, thread, message, user, forum
 
@@ -17,7 +17,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class CreateResponse : BaseResponse<PostModel<int, string>>
+    public class CreateResponse : BaseResponse<PostModel<int, string, string, int>>
     {
 
     }
@@ -37,7 +37,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class DetailsResponse : BaseResponse<PostModel<int, string>>
+    public class DetailsResponse : BaseResponse<PostModel<int, string, string, int>>
     {
 
     }
@@ -52,7 +52,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class ListPostsResponse : BaseResponse<List<PostModel<int, string>>>
+    public class ListPostsResponse : BaseResponse<List<PostModel<int, string, string, int>>>
     {
 
     }
@@ -93,7 +93,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class UpdateResponse : BaseResponse<PostModel<int, string>>
+    public class UpdateResponse : BaseResponse<PostModel<int, string, string, int>>
     {
 
     }
@@ -108,7 +108,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class VoteResponse : BaseResponse<PostModel<int, string>>
+    public class VoteResponse : BaseResponse<PostModel<int, string, string, int>>
     {
 
     }

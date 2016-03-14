@@ -132,6 +132,7 @@
     </Compile>
     <Compile Include="Models\BaseForumModel.cs" />
     <Compile Include="Models\BaseForumResponseModel.cs" />
+    <Compile Include="Models\BasePostModel.cs" />
     <Compile Include="Models\BaseThreadModel.cs" />
     <Compile Include="Models\CreateForumResponseModel.cs" />
     <Compile Include="Models\DetailsForumResponseModel.cs" />

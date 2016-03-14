@@ -149,9 +149,9 @@ namespace Forum.Services
             return new ListsPostsResponse
             {
                 Code = 0,
-                Response = new List<PostModel<int, string>>
+                Response = new List<PostModel<int, string, string, int>>
                 {
-                    new PostModel<int, string>
+                    new PostModel<int, string, string, int>
                     {
                         DateString = "2014-01-03 00:01:01",
                         Dislikes = 0,

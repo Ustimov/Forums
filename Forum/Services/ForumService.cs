@@ -77,47 +77,7 @@ namespace Forum.Services
             return new ListPostsResponse
             {
                 Code = 0,
-                Response = new List<PostModel<ThreadModel<string, string>, ForumModel<string>>>
-                {
-                    new PostModel<ThreadModel<string, string>, ForumModel<string>>
-                    {
-                        Date = new DateTime(),
-                        Dislikes = 0,
-                        Forum = new ForumModel<string>
-                        {
-                            Id = 2,
-                            Name = "Forum I",
-                            ShortName = "forum1",
-                            User = "example3@mail.ru",
-                        },
-                        Id = 5,
-                        IsApproved = false,
-                        IsDeleted = true,
-                        IsEdited = false,
-                        IsHighlighted = false,
-                        IsSpam = false,
-                        Likes = 0,
-                        Message = "my message 1",
-                        Points = 0,
-                        Thread = new ThreadModel<string, string>
-                        {
-                            Date = new DateTime(),
-                            Dislikes = 0,
-                            Forum = "forum1",
-                            Id = 3,
-                            IsClosed = false,
-                            IsDeleted = false,
-                            Likes = 0,
-                            Message = "hey hey!",
-                            Points = 0,
-                            Posts = 2,
-                            Slug = "thread2",
-                            Title = "Thread II",
-                            User = "example3@mail.ru",
-                        },
-                        User = "richard.nixon@example.com",
-                    }
-                }
+                
             };
         }
 

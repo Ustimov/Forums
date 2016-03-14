@@ -33,9 +33,9 @@ namespace Forum.Helpers
                 });
         }
 
-        public static PostModel<int, string> Read(CreatePost request)
+        public static PostModel<int, string, string, int> Read(CreatePost request)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string>>(
+            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
                 @"select * from Post where 
                 Parent=@Parent and IsApproved=@IsApproved and IsHighlighted=@IsHighlighted and IsEdited=@IsEdited
                 and IsSpam=@IsSpam and IsDeleted=@IsDeleted and Date=@Date and Thread=@Thread and Message=@Message
@@ -56,9 +56,9 @@ namespace Forum.Helpers
                 }).FirstOrDefault();
         }
 
-        public static PostModel<int, string> Read(int id)
+        public static PostModel<int, string, string, int> Read(int id)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string>>(
+            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
                 @"select * from Post where Id=@Id", new { Id = id }).FirstOrDefault();
         }
 

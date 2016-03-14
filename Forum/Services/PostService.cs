@@ -19,7 +19,11 @@ namespace Forum.Services
             {
                 PostCrud.Create(request);
 
-                return new BaseResponse<PostModel<int, string>> { Code = StatusCode.Ok, Response = PostCrud.Read(request) };
+                return new BaseResponse<PostModel<int, string, string, int>>
+                {
+                    Code = StatusCode.Ok,
+                    Response = PostCrud.Read(request)
+                };
             }
             catch(Exception e)
             {
@@ -40,7 +44,112 @@ namespace Forum.Services
 
                 if (request.Related == null)
                 {
-                    return new BaseResponse<PostModel<int, string>> { Code = StatusCode.Ok, Response = post };
+                    return new BaseResponse<PostModel<int, string, string, int>> { Code = StatusCode.Ok, Response = post };
+                }
+                else if (request.Related.Count == 3 && request.Related.Contains("user") &&
+                    request.Related.Contains("thread") && request.Related.Contains("forum"))
+                {
+                    return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int>
+                        {
+                            Thread = ThreadCrud.Read(post.Thread),
+                            Forum = ForumCrud.Read(post.Forum),
+                            User = UserCrud.Read(post.User),
+                            Parent = post.Parent,
+                        },
+                    };
+                }
+                else if (request.Related.Count == 2)
+                {
+                    if (request.Related.Contains("user") && request.Related.Contains("thread"))
+                    {
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, UserModel, int>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new PostModel<ThreadModel<string, string>, string, UserModel, int>
+                            {
+                                Thread = ThreadCrud.Read(post.Thread),
+                                Forum = post.Forum,
+                                User = UserCrud.Read(post.User),
+                                Parent = post.Parent,
+                            },
+                        };
+                    }
+                    else if (request.Related.Contains("user") && request.Related.Contains("forum"))
+                    {
+                        return new BaseResponse<PostModel<int, ForumModel<string>, UserModel, int>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new PostModel<int, ForumModel<string>, UserModel, int>
+                            {
+                                Thread = post.Id,
+                                Forum = ForumCrud.Read(post.Forum),
+                                User = UserCrud.Read(post.User),
+                                Parent = post.Parent,
+                            },
+                        };
+                    }
+                    else if (request.Related.Contains("thread") && request.Related.Contains("forum"))
+                    {
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, string, int>
+                            {
+                                Thread = ThreadCrud.Read(post.Thread),
+                                Forum = ForumCrud.Read(post.Forum),
+                                User = post.User,
+                                Parent = post.Parent,
+                            },
+                        };
+                    }
+                }
+                else if (request.Related.Count == 1)
+                {
+                    if (request.Related.Contains("user"))
+                    {
+                        return new BaseResponse<PostModel<int, string, UserModel, int>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new PostModel<int, string, UserModel, int>
+                            {
+                                Thread = post.Thread,
+                                Forum = post.Forum,
+                                User = UserCrud.Read(post.User),
+                                Parent = post.Parent,
+                            },
+                        };
+                    }
+                    else if (request.Related.Contains("thread"))
+                    {
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, string, int>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new PostModel<ThreadModel<string, string>, string, string, int>
+                            {
+                                Thread = ThreadCrud.Read(post.Thread),
+                                Forum = post.Forum,
+                                User = post.User,
+                                Parent = post.Parent,
+                            },
+                        };
+                    }
+                    else if (request.Related.Contains("forum"))
+                    {
+                        return new BaseResponse<PostModel<int, ForumModel<string>, string, int>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = new PostModel<int, ForumModel<string>, string, int>
+                            {
+                                Thread = post.Thread,
+                                Forum = ForumCrud.Read(post.Forum),
+                                User = post.User,
+                                Parent = post.Parent,
+                            },
+                        };
+                    }
                 }
 
                 return new BaseResponse<string> { Code = StatusCode.IncorrectRequest, Response = "Incorrect request" };
@@ -58,26 +167,7 @@ namespace Forum.Services
             return new ListPostsResponse
             {
                 Code = 0,
-                Response = new List<PostModel<int, string>>
-                {
-                    new PostModel<int, string>
-                    {
-                        Date = DateTime.Parse("2014-01-03 00:08:01"),
-                        Dislikes = 0,
-                        Forum = "forum1",
-                        Id = 5,
-                        IsApproved = false,
-                        IsDeleted = true,
-                        IsEdited = false,
-                        IsHighlighted = false,
-                        IsSpam = false,
-                        Likes = 0,
-                        Message = "my message 1",
-                        Points = 0,
-                        Thread = 3,
-                        User = "richard.nixon@example.com",
-                    }
-                }
+                
             };
         }
 
@@ -116,7 +206,7 @@ namespace Forum.Services
             return new UpdateResponse
             {
                 Code = 0,
-                Response = new PostModel<int, string>
+                Response = new PostModel<int, string, string, int>
                 {
                     Date = DateTime.Parse("2014-01-03 00:08:01"),
                     Dislikes = 0,
@@ -143,7 +233,7 @@ namespace Forum.Services
             return new VoteResponse
             {
                 Code = 0,
-                Response = new PostModel<int, string>
+                Response = new PostModel<int, string, string, int>
                 {
                     Date = DateTime.Parse("2014-01-03 00:08:01"),
                     Dislikes = 0,
