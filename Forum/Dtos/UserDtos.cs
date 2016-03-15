@@ -7,7 +7,7 @@ using Forum.Models;
 
 namespace Forum.Dtos.User
 {
-    [Route("/db/api/user/create/")]
+    [Route("/dbdb/api/user/create/")]
     [DataContract]
     public class CreateUser : UserModel
     {
@@ -21,7 +21,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/details/")]
+    [Route("/dbdb/api/user/details/")]
     [DataContract]
     public class UserDetails : BaseUser
     {
@@ -34,7 +34,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/follow/")]
+    [Route("/dbdb/api/user/follow/")]
     [DataContract]
     public class Follow : BaseFollow
     {
@@ -47,7 +47,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/listFollowers/")]
+    [Route("/dbdb/api/user/listFollowers/")]
     [DataContract]
     public class ListFollowers : BaseList
     {
@@ -61,7 +61,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/listFollowing")]
+    [Route("/dbdb/api/user/listFollowing")]
     [DataContract]
     public class ListFollowing : BaseList
     {
@@ -75,7 +75,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/listPosts/")]
+    [Route("/dbdb/api/user/listPosts/")]
     [DataContract]
     public class ListPosts : BaseList
     {
@@ -88,7 +88,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/unfollow/")]
+    [Route("/dbdb/api/user/unfollow/")]
     [DataContract]
     public class Unfollow : BaseFollow
     {
@@ -101,7 +101,7 @@ namespace Forum.Dtos.User
 
     }
 
-    [Route("/db/api/user/updateProfile/")]
+    [Route("/dbdb/api/user/updateProfile/")]
     [DataContract]
     public class UpdateProfile : UserModel
     {

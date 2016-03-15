@@ -59,7 +59,7 @@ namespace Forum.Dtos.Post
 
     [Route("/db/api/post/remove/")]
     [DataContract]
-    public class Remove : BasePost
+    public class RemovePost : BasePost
     {
 
     }
@@ -72,7 +72,7 @@ namespace Forum.Dtos.Post
 
     [Route("/db/api/post/restore/")]
     [DataContract]
-    public class Restore : BasePost
+    public class RestorePost : BasePost
     {
 
     }
@@ -85,7 +85,7 @@ namespace Forum.Dtos.Post
 
     [Route("/db/api/post/update/")]
     [DataContract]
-    public class Update : BasePost
+    public class UpdatePost : BasePost
     {
         // Required
         [DataMember(Name = "message")]
@@ -100,7 +100,7 @@ namespace Forum.Dtos.Post
 
     [Route("/db/api/post/vote/")]
     [DataContract]
-    public class Vote : BasePost
+    public class VotePost : BasePost
     {
         // Possible values: [1, -1]
         [DataMember(Name = "vote")]

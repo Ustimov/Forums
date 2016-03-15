@@ -37,6 +37,13 @@ namespace Forum.Helpers
                 new { ShortName = shortName }).FirstOrDefault();
         }
 
+        public static List<PostModel<int, string, string, int>> ReadPosts(ListPosts request)
+        {
+            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+                @"select * from Post", new { }
+                ).ToList();
+        }
+
         public static int Count()
         {
             return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Forum").FirstOrDefault();

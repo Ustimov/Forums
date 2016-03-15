@@ -8,6 +8,7 @@ using Forum.Dtos.Post;
 using Forum.Dtos.Base;
 using Forum.Models;
 using Forum.Helpers;
+using Dapper;
 
 namespace Forum.Services
 {
@@ -171,85 +172,73 @@ namespace Forum.Services
             };
         }
 
-        // Mark post as removed
-        // {"post": 3}
-        public object Post(Remove request)
+        public object Post(RemovePost request)
         {
-            return new RemoveResponse
+            try
             {
-                Code = 0,
-                Response = new BasePost
-                {
-                    Post = request.Post,
-                }
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set IsDeleted=true where Id=@Id", new { Id = request.Post });
+
+                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Post };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Cancel removal
-        // {"post": 3}
-        public object Post(Restore request)
+        public object Post(RestorePost request)
         {
-            return new RestoreResponse
+            try
             {
-                Code = 0,
-                Response = new BasePost
-                {
-                    Post = request.Post,
-                }
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set IsDeleted=false where Id=@Id", new { Id = request.Post });
+
+                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Post };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Edit post
-        // {"post": 3, "message": "my message 1"}
-        public object Post(Update request)
+        public object Post(UpdatePost request)
         {
-            return new UpdateResponse
+            try
             {
-                Code = 0,
-                Response = new PostModel<int, string, string, int>
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set Message=@Message where Id=@Id",
+                    new { Message = request.Message, Id = request.Post });
+
+                return new BaseResponse<PostModel<int, string, string, int>>
                 {
-                    Date = DateTime.Parse("2014-01-03 00:08:01"),
-                    Dislikes = 0,
-                    Forum = "forum1",
-                    Id = 5,
-                    IsApproved = false,
-                    IsDeleted = true,
-                    IsEdited = false,
-                    IsHighlighted = false,
-                    IsSpam = false,
-                    Likes = 0,
-                    Message = request.Message,
-                    Points = 0,
-                    Thread = 3,
-                    User = "richard.nixon@example.com",
-                }
-            };
+                    Code = StatusCode.Ok,
+                    Response = PostCrud.Read(request.Post),
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // like/dislike post
-        // {"vote": -1, "post": 5}
-        public object Post(Vote request)
+        public object Post(VotePost request)
         {
-            return new VoteResponse
+            if (request.Value == 1)
             {
-                Code = 0,
-                Response = new PostModel<int, string, string, int>
-                {
-                    Date = DateTime.Parse("2014-01-03 00:08:01"),
-                    Dislikes = 0,
-                    Forum = "forum1",
-                    Id = 5,
-                    IsApproved = false,
-                    IsDeleted = true,
-                    IsEdited = false,
-                    IsHighlighted = false,
-                    IsSpam = false,
-                    Likes = 0,
-                    Message = "fdfsd",
-                    Points = 0,
-                    Thread = 3,
-                    User = "richard.nixon@example.com",
-                }
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set Likes=Likes+1 where Id=@Id", new { Id = request.Post });
+            }
+            else if (request.Value == -1)
+            {
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set Dislikes=Dislikes+1 where Id=@Id", new { Id = request.Post });
+            }
+
+            return new BaseResponse<PostModel<int, string, string, int>>
+            {
+                Code = StatusCode.Ok,
+                Response = PostCrud.Read(request.Post),
             };
         }
 

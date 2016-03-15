@@ -9,7 +9,7 @@ namespace Forum.Dtos.Thread
 {
     [Route("/db/api/thread/close/")]
     [DataContract]
-    public class Close : BaseThread
+    public class CloseThread : BaseThread
     {
 
     }
@@ -80,7 +80,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/open/")]
     [DataContract]
-    public class Open : BaseThread
+    public class OpenThread : BaseThread
     {
 
     }
@@ -93,7 +93,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/remove/")]
     [DataContract]
-    public class Remove : BaseThread
+    public class RemoveThread : BaseThread
     {
 
     }
@@ -106,7 +106,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/restore/")]
     [DataContract]
-    public class Restore : BaseThread
+    public class RestoreThread : BaseThread
     {
 
     }
@@ -145,7 +145,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/update/")]
     [DataContract]
-    public class Update : BaseThread
+    public class UpdateThread : BaseThread
     {
         // Required
         [DataMember(Name = "message")]
@@ -164,7 +164,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/vote/")]
     [DataContract]
-    public class Vote : BaseThread
+    public class VoteThread : BaseThread
     {
         // [-1, 1]
         [DataMember(Name = "vote")]

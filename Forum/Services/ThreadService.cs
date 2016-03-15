@@ -14,18 +14,19 @@ namespace Forum.Services
 {
     public class ThreadService : Service
     {
-        // Mark thread as closed
-        // {"thread": 1}
-        public object Post(Close request)
+        public object Post(CloseThread request)
         {
-            return new CloseResponse
+            try
             {
-                Code = 0,
-                Response = new BaseThread
-                {
-                    Thread = request.Thread,
-                },
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Thread set IsClosed=true where Id=@Id", new { Id = request.Thread });
+
+                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Post(CreateThread request)
@@ -117,29 +118,21 @@ namespace Forum.Services
             }
         }
 
-        // List threads
-        // thread/list/?since=2014-01-01+00%3A00%3A00&order=desc&forum=forum1
         public object Get(ListThreads request)
         {
-            return new ListThreadsResponse
+            try
             {
-                Code = 0,
-                Response = new List<ThreadModel<string, string>>
-                {
-                    new ThreadModel<string, string>
-                    {
-                        DateString = "2014-01-01 00:00:01",
-                        Forum = "forum1",
-                        Id = 1,
-                        IsClosed = true,
-                        IsDeleted = true,
-                        Message = "hey hey hey hey!",
-                        Slug = "Threadwithsufficientlylargetitle",
-                        Title = "Thread With Sufficiently Large Title",
-                        User = "example3@mail.ru",
-                    },
-                },
-            };
+                /*
+                var threads = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+                    @"select * from Thread where " + request.User == null? "Forum=@Forum" : "User=@User" +
+                    request.Date == null ? string.Empty : " and )
+                */
+                throw new NotImplementedException();
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         // Get posts from this thread
@@ -171,46 +164,49 @@ namespace Forum.Services
             };
         }
 
-        // Mark thread as opened
-        // {"thread": 1}
-        public object Post(Open request)
+        public object Post(OpenThread request)
         {
-            return new OpenResponse
+            try
             {
-                Code = 0,
-                Response = new BaseThread
-                {
-                    Thread = request.Thread,
-                }
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Thread set IsClosed=false where Id=@Id", new { Id = request.Thread });
+
+                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Mark thread as removed
-        // {"thread": 1}
-        public object Post(Remove request)
+        public object Post(RemoveThread request)
         {
-            return new RemoveResponse
+            try
             {
-                Code = 0,
-                Response = new BaseThread
-                {
-                    Thread = request.Thread,
-                }
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Thread set IsDeleted=true where Id=@Id", new { Id = request.Thread });
+
+                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // Cancel removal
-        // {"thread": 1}
-        public object Post(Restore request)
+        public object Post(RestoreThread request)
         {
-            return new RestoreResponse
+            try
             {
-                Code = 0,
-                Response = new BaseThread
-                {
-                    Thread = request.Thread,
-                }
-            };
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Thread set IsDeleted=false where Id=@Id", new { Id = request.Thread });
+
+                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Post(Subscribe request)
@@ -253,48 +249,53 @@ namespace Forum.Services
             }
         }
 
-        // Edit thread
-        // {"message": "hey hey hey hey!", "slug": "newslug", "thread": 1}
-        public object Post(Update request)
+        public object Post(UpdateThread request)
         {
-            return new UpdateResponse
+            try
             {
-                Code = 0,
-                Response = new ThreadModel<string, string>
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Thread set Message=@Message, Slug=@Slug where Id=@Id",
+                    new { Message = request.Message, Slug = request.Slug, Id = request.Thread });
+
+                return new BaseResponse<ThreadModel<string, string>>
                 {
-                    DateString = "2014-01-01 00:00:01",
-                    Forum = "forum1",
-                    Id = 1,
-                    IsClosed = true,
-                    IsDeleted = true,
-                    Message = "hey hey hey hey!",
-                    Slug = "Threadwithsufficientlylargetitle",
-                    Title = "Thread With Sufficiently Large Title",
-                    User = "example3@mail.ru",
-                },
-            };
+                    Code = StatusCode.Ok,
+                    Response = ThreadCrud.Read(request.Thread),
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        // like/dislike thread
-        // {"vote": 1, "thread": 1}
-        public object Post(Vote request)
+        public object Post(VoteThread request)
         {
-            return new VoteResponse
+            try
             {
-                Code = 0,
-                Response = new ThreadModel<string, string>
+                if (request.Value == 1)
                 {
-                    DateString = "2014-01-01 00:00:01",
-                    Forum = "forum1",
-                    Id = 1,
-                    IsClosed = true,
-                    IsDeleted = true,
-                    Message = "hey hey hey hey!",
-                    Slug = "Threadwithsufficientlylargetitle",
-                    Title = "Thread With Sufficiently Large Title",
-                    User = "example3@mail.ru",
-                },
-            };
+                    ConnectionProvider.DbConnection.Execute(
+                        @"update Thread set Likes=Likes+1 where Id=@Id", new { Id = request.Thread });
+                }
+                else if (request.Value == -1)
+                {
+                    ConnectionProvider.DbConnection.Execute(
+                        @"update Thread set Dislikes=Dislikes+1 where Id=@Id", new { Id = request.Thread });
+                }
+
+                return new BaseResponse<ThreadModel<string, string>>
+                {
+                    Code = StatusCode.Ok,
+                    Response = ThreadCrud.Read(request.Thread),
+                };
+
+                //return new BaseResponse<string> { Code = StatusCode.UndefinedError, Response = "Undefined error" };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 }
