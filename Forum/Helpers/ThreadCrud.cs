@@ -52,6 +52,24 @@ namespace Forum.Helpers
                 }).FirstOrDefault();
         }
 
+        public static List<ThreadModel<string, string>> ReadAll(string forum, string user, DateTime? since,
+            string order, int? limit)
+        {
+            return ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+                @"select * from Thread where " +
+                (user == null ? "Forum=@Forum" : "User=@User") +
+                (since == null ? string.Empty : " and Date >= @Since") +
+                (order == null ? string.Empty : " order by Date " + order) +
+                (limit == null ? string.Empty : " limit @Limit"),
+                new
+                {
+                    Forum = forum,
+                    User = user,
+                    Since = since,
+                    Limit = limit,
+                }).AsList();
+        }
+
         /*
         public static ThreadModel<ForumModel, string> ReadWithForum(int id)
         {

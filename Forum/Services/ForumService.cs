@@ -83,62 +83,94 @@ namespace Forum.Services
             };
         }
 
-        // Get posts from this forum
-        // http://some.host.ru/db/api/forum/listPosts/?related=thread&related=forum&since=2014-01-01+00%3A00%3A00&order=desc&forum=forum1
         public object Get(ListThreads request)
         {
-            return new ListThreadsResponse
+            try
             {
-                Code = 0,
-                Response = new List<ThreadModel<ForumModel<string>, string>>
+                var threads = ThreadCrud.ReadAll(request.Forum, null, request.Since, request.Order, request.Limit);
+
+                if (request.Related == null)
                 {
-                    new ThreadModel<ForumModel<string>, string>
+                    return new BaseResponse<List<ThreadModel<string, string>>> { Code = StatusCode.Ok, Response = threads };
+                }
+                else if (request.Related.Count == 2 && request.Related.Contains("user") && request.Related.Contains("forum"))
+                {
+                    var threadWithUserAndForum = new List<ThreadModel<ForumModel<string>, UserModel>>();
+                    foreach (var thread in threads)
                     {
-                        Date = DateTime.Parse("2014-01-01 00:00:01"),
-                        Dislikes = 0,
-                        Forum = new ForumModel<string>
+                        threadWithUserAndForum.Add(new ThreadModel<ForumModel<string>, UserModel>(thread)
                         {
-                            Id = 2,
-                            Name = "Forum I",
-                            ShortName = "forum1",
-                            User = "example3@mail.ru",
-                        },
-                        Id = 1,
-                        IsClosed = true,
-                        IsDeleted = true,
-                        Likes = 0,
-                        Message = "hey hey hey hey!",
-                        Points = 0,
-                        Posts = 0,
-                        Slug = "Threadwithsufficientlylargetitle",
-                        Title = "Thread With Sufficiently Large Title",
-                        User = "example3@mail.ru",
+                            User = UserCrud.Read(thread.User),
+                            Forum = ForumCrud.Read(thread.Forum),
+                        });
+                    }
+
+                    return new BaseResponse<List<ThreadModel<ForumModel<string>, UserModel>>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = threadWithUserAndForum,
+                    };
+                }
+                else if (request.Related.Count == 1)
+                {
+                    if (request.Related.Contains("user"))
+                    {
+                        var threadWithUser = new List<ThreadModel<string, UserModel>>();
+                        
+                        foreach (var thread in threads)
+                        {
+                            threadWithUser.Add(new ThreadModel<string, UserModel>(thread)
+                            {
+                                User = UserCrud.Read(thread.User),
+                                Forum = thread.Forum,
+                            });
+                        }
+
+                        return new BaseResponse<List<ThreadModel<string, UserModel>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = threadWithUser,
+                        };
+                    }
+                    else if (request.Related.Contains("forum"))
+                    {
+                        var threadWithForum = new List<ThreadModel<ForumModel<string>, string>>();
+
+                        foreach (var thread in threads)
+                        {
+                            threadWithForum.Add(new ThreadModel<ForumModel<string>, string>(thread)
+                            {
+                                User = thread.User,
+                                Forum = ForumCrud.Read(thread.Forum),
+                            });
+                        }
+
+                        return new BaseResponse<List<ThreadModel<ForumModel<string>, string>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = threadWithForum,
+                        };
                     }
                 }
-            };
+
+                return new BaseResponse<string> { Code = StatusCode.UndefinedError, Response = "Undefined error" };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Get(ListUsers request)
         {
-            return new ListUsersResponse
+            try
             {
-                Code = 0,
-                Response = new List<UserModel>
-                {
-                    new UserModel
-                    {
-                        About = null,
-                        Email = "richard.nixon@example.com",
-                        Followers = new List<string>(),
-                        Following = new List<string>(),
-                        Id = 2,
-                        IsAnonymous = true,
-                        Name = null,
-                        Subscriptions = new List<int>(),
-                        Username = null,
-                    }
-                }
-            };
+                return new BaseResponse<List<UserModel>> { Code = StatusCode.Ok, Response = UserCrud.ReadAll(request) };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
     }
 }

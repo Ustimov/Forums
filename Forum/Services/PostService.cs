@@ -161,17 +161,36 @@ namespace Forum.Services
             }
         }
 
-        // List posts
-        // http://some.host.ru/db/api/post/list/?since=2014-01-01+00%3A00%3A00&order=desc&forum=forum1
         public object Get(ListPosts request)
         {
-            throw new NotImplementedException();
-
-            return new ListPostsResponse
+            try
             {
-                Code = 0,
-                
-            };
+                var sql = "select * from Post where " +
+                    (request.Thread == null ? "Forum=@Forum" : "Thread=@Thread") +
+                    (request.Since == null ? string.Empty : " and Date >= @Since") +
+                    (request.Order == null ? string.Empty : " order by Date " + request.Order) +
+                    (request.Limit == null ? string.Empty : " limit @Limit");
+
+                var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+                    sql,
+                    new
+                    {
+                        Forum = request.Forum,
+                        Thread = request.Thread,
+                        Since = request.Since,
+                        Limit = request.Limit,
+                    }).AsList();
+
+                return new BaseResponse<List<PostModel<int, string, string, int>>>
+                {
+                    Code = StatusCode.Ok,
+                    Response = posts
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Post(RemovePost request)

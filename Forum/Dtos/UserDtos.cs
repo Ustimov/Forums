@@ -79,7 +79,8 @@ namespace Forum.Dtos.User
     [DataContract]
     public class ListPosts : BaseList
     {
-
+        [DataMember(Name = "user")]
+        public string User { get; set; }
     }
 
     [DataContract]

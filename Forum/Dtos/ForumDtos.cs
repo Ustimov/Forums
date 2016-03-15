@@ -80,7 +80,7 @@ namespace Forum.Dtos.Forum
     {
         // Optional
         [DataMember(Name = "limit")]
-        public int Limit { get; set; }
+        public int? Limit { get; set; }
 
         // Optional
         // Possible values: ['desc', 'asc']. Default: 'desc'
@@ -90,7 +90,7 @@ namespace Forum.Dtos.Forum
         // Optional
         // return entities in interval [since_id, max_id]
         [DataMember(Name = "since_id")]
-        public int SinceId { get; set; }
+        public int? SinceId { get; set; }
 
         // Required
         [DataMember(Name = "forum")]

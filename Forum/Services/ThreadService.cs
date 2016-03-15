@@ -121,13 +121,12 @@ namespace Forum.Services
         public object Get(ListThreads request)
         {
             try
-            {
-                /*
-                var threads = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
-                    @"select * from Thread where " + request.User == null? "Forum=@Forum" : "User=@User" +
-                    request.Date == null ? string.Empty : " and )
-                */
-                throw new NotImplementedException();
+            {   
+                return new BaseResponse<List<ThreadModel<string, string>>>
+                {
+                    Code = StatusCode.Ok,
+                    Response = ThreadCrud.ReadAll(request.Forum, request.User, request.Since, request.Order, request.Limit),
+                };
             }
             catch (Exception e)
             {

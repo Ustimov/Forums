@@ -48,7 +48,7 @@ namespace Forum.Dtos.Post
     {
         // Thread or Forum is required
         [DataMember(Name = "thread")]
-        public int Thread { get; set; }
+        public int? Thread { get; set; }
     }
 
     [DataContract]

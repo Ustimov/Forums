@@ -18,14 +18,14 @@ namespace Forum.Dtos.Base
     {
         // Optional
         [DataMember(Name = "since")]
-        public DateTime Since { get; set; }
+        public DateTime? Since { get; set; }
 
         [DataMember(Name = "since_id")]
-        public int SinceId { get; set; }
+        public int? SinceId { get; set; }
 
         // Optional
         [DataMember(Name = "limit")]
-        public int Limit { get; set; }
+        public int? Limit { get; set; }
 
         // Optional
         // Possible values: ['desc', 'asc']. Default: 'desc'

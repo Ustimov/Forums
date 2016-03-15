@@ -92,34 +92,30 @@ namespace Forum.Services
             }
         }
 
-        // Get posts from this user
-        // user/listPosts/?since=2014-01-02+00%3A00%3A00&limit=2&user=example%40mail.ru&order=asc:
         public object Get(ListPosts request)
         {
-            return new ListPostsResponse
+            try
             {
-                Code = 0,
-                Response = new List<PostModel<int, string, string, int>>
-                {
-                    new PostModel<int, string, string, int>
+                var sql = "select * from Post where User=@User" +
+                    (request.Since == null ? string.Empty : " and Date >= @Since") +
+                    (request.Order == null ? string.Empty : " order by Date " + request.Order) +
+                    (request.Limit == null ? string.Empty : " limit @Limit");
+
+                var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+                    sql,
+                    new
                     {
-                        Date = new DateTime(),
-                        Dislikes = 0,
-                        Forum = "forum1",
-                        Id = 5,
-                        IsApproved = false,
-                        IsDeleted = true,
-                        IsEdited = false,
-                        IsHighlighted = false,
-                        IsSpam = false,
-                        Likes = 0,
-                        Message = "my message 1",
-                        Points = 0,
-                        Thread = 4,
-                        User = "richard.nixon@example.com",
-                    }
-                },
-            };
+                        User = request.User,
+                        Since = request.Since,
+                        Limit = request.Limit,
+                    }).AsList();
+
+                return new BaseResponse<List<PostModel<int, string, string, int>>> { Code = StatusCode.Ok, Response = posts };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Post(Unfollow request)
