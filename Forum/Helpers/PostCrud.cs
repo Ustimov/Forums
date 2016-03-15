@@ -62,6 +62,28 @@ namespace Forum.Helpers
                 @"select * from Post where Id=@Id", new { Id = id }).FirstOrDefault();
         }
 
+        public static List<PostModel<int, string, string, int>> ReadAll(string forum, int? thread, DateTime? since,
+            string order, int? limit)
+        {
+            var sql = "select * from Post where " +
+                (thread == null ? "Forum=@Forum" : "Thread=@Thread") +
+                (since == null ? string.Empty : " and Date >= @Since") +
+                (order == null ? string.Empty : " order by Date " + order) +
+                (limit == null ? string.Empty : " limit @Limit");
+
+            var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+                sql,
+                new
+                {
+                    Forum = forum,
+                    Thread = thread,
+                    Since = since,
+                    Limit = limit,
+                }).AsList();
+
+            return posts;
+        }
+
         public static int Count()
         {
             return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Post").FirstOrDefault();

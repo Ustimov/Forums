@@ -92,7 +92,7 @@ namespace Forum.Services
             }
         }
 
-        public object Get(ListPosts request)
+        public object Get(UserListPosts request)
         {
             try
             {

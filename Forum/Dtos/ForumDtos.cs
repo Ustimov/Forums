@@ -49,7 +49,7 @@ namespace Forum.Dtos.Forum
 
     [Route("/db/api/forum/listPosts/")]
     [DataContract]
-    public class ListPosts : BaseList
+    public class ForumListPosts : BaseList
     {
         // Possible Related values: ['thread', 'forum', 'user']
     }
@@ -63,7 +63,7 @@ namespace Forum.Dtos.Forum
 
     [Route("/db/api/forum/listThreads/")]
     [DataContract]
-    public class ListThreads : BaseList
+    public class ForumListThreads : BaseList
     {
         // Possible Related values: ['forum', 'user']
     }
@@ -76,7 +76,7 @@ namespace Forum.Dtos.Forum
 
     [Route("/db/api/forum/listUsers/")]
     [DataContract]
-    public class ListUsers
+    public class ForumListUsers
     {
         // Optional
         [DataMember(Name = "limit")]

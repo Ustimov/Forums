@@ -50,7 +50,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/list/")]
     [DataContract]
-    public class ListThreads : BaseList
+    public class ThreadListThreads : BaseList
     {
         // Required user or forum
         [DataMember(Name = "user")]
@@ -65,7 +65,7 @@ namespace Forum.Dtos.Thread
 
     [Route("/db/api/thread/listPosts/")]
     [DataContract]
-    public class ListPosts : BaseList
+    public class ThreadListPosts : BaseList
     {
         // Required
         [DataMember(Name = "thread")]

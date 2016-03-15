@@ -77,7 +77,7 @@ namespace Forum.Dtos.User
 
     [Route("/db/api/user/listPosts/")]
     [DataContract]
-    public class ListPosts : BaseList
+    public class UserListPosts : BaseList
     {
         [DataMember(Name = "user")]
         public string User { get; set; }

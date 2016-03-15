@@ -70,20 +70,190 @@ namespace Forum.Services
             }
         }
 
-        // Get posts from this forum
-        // http://some.host.ru/db/api/forum/listPosts/?related=thread&related=forum&since=2014-01-01+00%3A00%3A00&order=desc&forum=forum1
-        public object Get(ListPosts request)
+        public object Get(ForumListPosts request)
         {
-            throw new NotImplementedException();
-
-            return new ListPostsResponse
+            try
             {
-                Code = 0,
-                
-            };
+                var posts = PostCrud.ReadAll(request.Forum, null, request.Since, request.Order, request.Limit);
+
+                if (request.Related == null)
+                {
+                    return new BaseResponse<List<PostModel<int, string, string, int>>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = posts,
+                    };
+                }
+                else if (request.Related.Count == 3 && request.Related.Contains("thread")
+                    && request.Related.Contains("forum") && request.Related.Contains("user"))
+                {
+                    var postWithThreadForumAndUser = new List<PostModel<ThreadModel<string, string>, ForumModel<string>,
+                        UserModel, int>>();
+
+                    foreach (var post in posts)
+                    {
+                        postWithThreadForumAndUser.Add(new PostModel<ThreadModel<string, string>, ForumModel<string>,
+                            UserModel, int>
+                        {
+                            Thread = ThreadCrud.Read(post.Thread),
+                            Forum = ForumCrud.Read(post.Forum),
+                            User = UserCrud.Read(post.User),
+                            Parent = post.Parent,
+                        });
+                    }
+
+                    return new BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int>>>
+                    {
+                        Code = StatusCode.Ok,
+                        Response = postWithThreadForumAndUser,
+                    };
+                }
+                else if (request.Related.Count == 2)
+                {
+                    if (request.Related.Contains("thread") && request.Related.Contains("forum"))
+                    {
+                        var postWithThreadAndForum = new List<PostModel<ThreadModel<string, string>, ForumModel<string>,
+                        string, int>>();
+
+                        foreach (var post in posts)
+                        {
+                            postWithThreadAndForum.Add(new PostModel<ThreadModel<string, string>, ForumModel<string>,
+                                string, int>
+                            {
+                                Thread = ThreadCrud.Read(post.Thread),
+                                Forum = ForumCrud.Read(post.Forum),
+                                User = post.User,
+                                Parent = post.Parent,
+                            });
+                        }
+
+                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = postWithThreadAndForum,
+                        };
+                    }
+                    else if (request.Related.Contains("thread") && request.Related.Contains("user"))
+                    {
+                        var postWithThreadAndUser = new List<PostModel<ThreadModel<string, string>, string,
+                            UserModel, int>>();
+
+                        foreach (var post in posts)
+                        {
+                            postWithThreadAndUser.Add(new PostModel<ThreadModel<string, string>, string, UserModel, int>
+                            {
+                                Thread = ThreadCrud.Read(post.Thread),
+                                Forum = post.Forum,
+                                User = UserCrud.Read(post.User),
+                                Parent = post.Parent,
+                            });
+                        }
+
+                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, string, UserModel, int>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = postWithThreadAndUser,
+                        };
+                    }
+                    else if (request.Related.Contains("user") && request.Related.Contains("forum"))
+                    {
+                        var postWithUserAndForum = new List<PostModel<int, ForumModel<string>,
+                            UserModel, int>>();
+
+                        foreach (var post in posts)
+                        {
+                            postWithUserAndForum.Add(new PostModel<int, ForumModel<string>, UserModel, int>
+                            {
+                                Thread = post.Thread,
+                                Forum = ForumCrud.Read(post.Forum),
+                                User = UserCrud.Read(post.User),
+                                Parent = post.Parent,
+                            });
+                        }
+
+                        return new BaseResponse<List<PostModel<int, ForumModel<string>, UserModel, int>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = postWithUserAndForum,
+                        };
+                    }
+                }
+                else if (request.Related.Count == 1)
+                {
+                    if (request.Related.Contains("user"))
+                    {
+                        var postWithUser = new List<PostModel<int, string, UserModel, int>>();
+
+                        foreach (var post in posts)
+                        {
+                            postWithUser.Add(new PostModel<int, string, UserModel, int>
+                            {
+                                Thread = post.Thread,
+                                Forum = post.Forum,
+                                User = UserCrud.Read(post.User),
+                                Parent = post.Parent,
+                            });
+                        }
+
+                        return new BaseResponse<List<PostModel<int, string, UserModel, int>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = postWithUser,
+                        };
+                    }
+                    else if (request.Related.Contains("forum"))
+                    {
+                        var postWithForum = new List<PostModel<int, ForumModel<string>, string, int>>();
+
+                        foreach (var post in posts)
+                        {
+                            postWithForum.Add(new PostModel<int, ForumModel<string>, string, int>
+                            {
+                                Thread = post.Thread,
+                                Forum = ForumCrud.Read(post.Forum),
+                                User = post.User,
+                                Parent = post.Parent,
+                            });
+                        }
+
+                        return new BaseResponse<List<PostModel<int, ForumModel<string>, string, int>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = postWithForum,
+                        };
+                    }
+                    else if (request.Related.Contains("thread"))
+                    {
+                        var postWithThread = new List<PostModel<ThreadModel<string, string>, string, string, int>>();
+
+                        foreach (var post in posts)
+                        {
+                            postWithThread.Add(new PostModel<ThreadModel<string, string>, string, string, int>
+                            {
+                                Thread = ThreadCrud.Read(post.Thread),
+                                Forum = post.Forum,
+                                User = post.User,
+                                Parent = post.Parent,
+                            });
+                        }
+
+                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, string, string, int>>>
+                        {
+                            Code = StatusCode.Ok,
+                            Response = postWithThread,
+                        };
+                    }
+                }
+
+                return new BaseResponse<string> { Code = StatusCode.UndefinedError, Response = "Undefined error" };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
-        public object Get(ListThreads request)
+        public object Get(ForumListThreads request)
         {
             try
             {
@@ -161,10 +331,11 @@ namespace Forum.Services
             }
         }
 
-        public object Get(ListUsers request)
+        public object Get(ForumListUsers request)
         {
             try
             {
+                // TODO
                 return new BaseResponse<List<UserModel>> { Code = StatusCode.Ok, Response = UserCrud.ReadAll(request) };
             }
             catch (Exception e)

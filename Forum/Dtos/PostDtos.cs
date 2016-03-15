@@ -44,7 +44,7 @@ namespace Forum.Dtos.Post
 
     [Route("/db/api/post/list/")]
     [DataContract]
-    public class ListPosts : BaseList
+    public class PostListPosts : BaseList
     {
         // Thread or Forum is required
         [DataMember(Name = "thread")]

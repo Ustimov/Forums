@@ -114,7 +114,7 @@ namespace Forum.Helpers
                 ToList();
         }
 
-        public static List<UserModel> ReadAll(ListUsers request)
+        public static List<UserModel> ReadAll(ForumListUsers request)
         {
             throw new NotImplementedException();
             // Get user with posts on this forum

@@ -161,25 +161,11 @@ namespace Forum.Services
             }
         }
 
-        public object Get(ListPosts request)
+        public object Get(PostListPosts request)
         {
             try
             {
-                var sql = "select * from Post where " +
-                    (request.Thread == null ? "Forum=@Forum" : "Thread=@Thread") +
-                    (request.Since == null ? string.Empty : " and Date >= @Since") +
-                    (request.Order == null ? string.Empty : " order by Date " + request.Order) +
-                    (request.Limit == null ? string.Empty : " limit @Limit");
-
-                var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
-                    sql,
-                    new
-                    {
-                        Forum = request.Forum,
-                        Thread = request.Thread,
-                        Since = request.Since,
-                        Limit = request.Limit,
-                    }).AsList();
+                var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
 
                 return new BaseResponse<List<PostModel<int, string, string, int>>>
                 {

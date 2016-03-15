@@ -118,7 +118,7 @@ namespace Forum.Services
             }
         }
 
-        public object Get(ListThreads request)
+        public object Get(ThreadListThreads request)
         {
             try
             {   
@@ -136,7 +136,7 @@ namespace Forum.Services
 
         // Get posts from this thread
         // thread/listPosts/?since=2014-01-02+00%3A00%3A00&limit=2&order=asc&thread=3
-        public object Get(ListPosts request)
+        public object Get(ThreadListPosts request)
         {
             return new ListsPostsResponse
             {
