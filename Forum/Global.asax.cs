@@ -1,8 +1,10 @@
 ﻿using System;
 using ServiceStack.WebHost.Endpoints;
 using Forum.Services;
-using ServiceStack.Common.Web;
+using System.Collections.Generic;
 using ServiceStack.Text;
+using ServiceStack.Text.WP;
+using ServiceStack.Common.Web;
 
 namespace Forum
 {
@@ -21,9 +23,10 @@ namespace Forum
                 {
                     DefaultContentType = MimeTypes.Json,
                     //EnableFeatures = Feature.All.Remove(Feature.Metadata),
-                    //AppendUtf8CharsetOnContentTypes = new HashSet<string> { ContentType.Json }
+                    AppendUtf8CharsetOnContentTypes = new System.Collections.Generic.HashSet<string> { ContentType.Json },
                 });
                 JsConfig.IncludeNullValues = true;
+                JsConfig.EscapeUnicode = true;
                 /*
                 this.ResponseFilters.Add((req, res, dto) => {
                     if (req.ResponseContentType == ContentType.Json)

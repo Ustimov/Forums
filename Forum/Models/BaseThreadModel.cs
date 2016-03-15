@@ -35,7 +35,7 @@ namespace Forum.Models
         public string Message { get; set; }
 
         [DataMember(Name = "points")]
-        public int Points { get; set; }
+        public int Points { get { return Likes - Dislikes; } }
 
         [DataMember(Name = "posts")]
         public int Posts { get; set; }
@@ -60,7 +60,6 @@ namespace Forum.Models
             IsDeleted = baseThreadModel.IsDeleted;
             Likes = baseThreadModel.Likes;
             Message = baseThreadModel.Message;
-            Points = baseThreadModel.Points;
             Posts = baseThreadModel.Posts;
             Slug = baseThreadModel.Slug;
             Title = baseThreadModel.Title;

@@ -175,6 +175,9 @@ namespace Forum.Services
                 ConnectionProvider.DbConnection.Execute(
                     @"update Thread set IsDeleted=true where Id=@Id", new { Id = request.Thread });
 
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set IsDeleted=true where Thread=@Id", new { Id = request.Thread });
+
                 return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
             }
             catch (Exception e)
@@ -189,6 +192,9 @@ namespace Forum.Services
             {
                 ConnectionProvider.DbConnection.Execute(
                     @"update Thread set IsDeleted=false where Id=@Id", new { Id = request.Thread });
+
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Post set IsDeleted=false where Thread=@Id", new { Id = request.Thread });
 
                 return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
             }

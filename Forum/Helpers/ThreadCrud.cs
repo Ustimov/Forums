@@ -13,8 +13,8 @@ namespace Forum.Helpers
         public static void Create(CreateThread request)
         {
             ConnectionProvider.DbConnection.Execute(
-                @"insert into Thread (Forum, Title, IsClosed, User, Date, Message, Slug, IsDeleted)
-                values (@Forum, @Title, @IsClosed, @User, @Date, @Message, @Slug, @IsDeleted)",
+                @"insert into Thread (Forum, Title, IsClosed, User, Date, Message, Slug, IsDeleted, Likes, Dislikes)
+                values (@Forum, @Title, @IsClosed, @User, @Date, @Message, @Slug, @IsDeleted, 0, 0)",
                 new
                 {
                     Forum = request.Forum,

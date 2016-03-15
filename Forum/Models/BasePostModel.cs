@@ -43,7 +43,7 @@ namespace Forum.Models
         public string Message { get; set; }
 
         [DataMember(Name = "points")]
-        public int Points { get; set; }
+        public int Points { get { return Likes - Dislikes; } }
 
         public BasePostModel()
         {
@@ -62,7 +62,6 @@ namespace Forum.Models
             IsSpam = basePostModel.IsSpam;
             Likes = basePostModel.Likes;
             Message = basePostModel.Message;
-            Points = basePostModel.Points;
         }
     }
 }
