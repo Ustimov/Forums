@@ -49,7 +49,7 @@ namespace Forum.Services
             try
             {
                 ConnectionProvider.DbConnection.Execute(
-                    @"insert into Follower values(@Follower, @Followee)",
+                    @"insert into Follower (Follower, Followee) values(@Follower, @Followee)",
                     new { Follower = request.Follower, Followee = request.Followee });
 
                 return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = UserCrud.Read(request.Follower) };
@@ -64,10 +64,14 @@ namespace Forum.Services
         {
             try
             {
+                var users = UserCrud.ReadFollowers(request);
+
+                System.Diagnostics.Debug.WriteLine($"{ request.Email } | { users.Count }");
+
                 return new BaseResponse<List<UserModel>>
                 {
                     Code = StatusCode.Ok,
-                    Response = UserCrud.ReadFollowers(request),
+                    Response = users,
                 };
             }
             catch (Exception e)
@@ -80,10 +84,12 @@ namespace Forum.Services
         {
             try
             {
+                var users = UserCrud.ReadFollowing(request);
+
                 return new BaseResponse<List<UserModel>>
                 {
                     Code = StatusCode.Ok,
-                    Response = UserCrud.ReadFollowing(request),
+                    Response = users,
                 };
             }
             catch (Exception e)

@@ -14,9 +14,10 @@ namespace Forum.Helpers
         {
             ConnectionProvider.DbConnection.Execute(
                 @"insert into Post 
-                (Parent, IsApproved, IsHighlighted, IsEdited, IsSpam, IsDeleted, Date, Thread, Message, User, Forum)
+                (Parent, IsApproved, IsHighlighted, IsEdited, IsSpam, IsDeleted, Date, Thread, Message, User, Forum,
+                Likes, Dislikes)
                 values (@Parent, @IsApproved, @IsHighlighted, @IsEdited, @IsSpam, @IsDeleted, @Date, @Thread,
-                @Message, @User, @Forum)",
+                @Message, @User, @Forum, 0, 0)",
                 new
                 {
                     Parent = request.Parent,

@@ -62,8 +62,9 @@ namespace Forum.Helpers
         {
             var users = ConnectionProvider.DbConnection.Query<UserModel>(
                 @"select * from Follower f left join User u on f.Follower=u.Email
-                where f.Followee=@Email and u.Id >= @SinceId order by @Order",
-                new { Email = request.Email, SinceId = request.SinceId, Order = request.Order });
+                where f.Followee=@Email" + (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId")
+                + " order by u.Name " + request.Order,
+                new { Email = request.Email, SinceId = request.SinceId });
 
             foreach (var user in users)
             {
@@ -79,8 +80,9 @@ namespace Forum.Helpers
         {
             var users = ConnectionProvider.DbConnection.Query<UserModel>(
                 @"select * from Follower f left join User u on f.Followee=u.Email
-                where f.Follower=@Email and u.Id >= @SinceId order by @Order",
-                new { Email = request.Email, SinceId = request.SinceId, Order = request.Order });
+                where f.Follower=@Email" + (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId")
+                + " order by u.Name " + request.Order,
+                new { Email = request.Email, SinceId = request.SinceId });
 
             foreach (var user in users)
             {

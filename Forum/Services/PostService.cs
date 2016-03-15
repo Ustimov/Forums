@@ -233,6 +233,7 @@ namespace Forum.Services
 
         public object Post(VotePost request)
         {
+            System.Diagnostics.Debug.WriteLine($"Thread: { request.Post } | Value {request.Value}");
             if (request.Value == 1)
             {
                 ConnectionProvider.DbConnection.Execute(
