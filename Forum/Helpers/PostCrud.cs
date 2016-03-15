@@ -33,16 +33,15 @@ namespace Forum.Helpers
                 });
         }
 
-        public static PostModel<int, string, string, int> Read(CreatePost request)
+        public static PostModel<int, string, string, int?> Read(CreatePost request)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
                 @"select * from Post where 
-                Parent=@Parent and IsApproved=@IsApproved and IsHighlighted=@IsHighlighted and IsEdited=@IsEdited
+                IsApproved=@IsApproved and IsHighlighted=@IsHighlighted and IsEdited=@IsEdited
                 and IsSpam=@IsSpam and IsDeleted=@IsDeleted and Date=@Date and Thread=@Thread and Message=@Message
                 and User=@User and Forum=@Forum",
                 new
                 {
-                    Parent = request.Parent,
                     IsApproved = request.IsApproved,
                     IsHighlighted = request.IsHighlighted,
                     IsEdited = request.IsEdited,
@@ -56,22 +55,22 @@ namespace Forum.Helpers
                 }).FirstOrDefault();
         }
 
-        public static PostModel<int, string, string, int> Read(int id)
+        public static PostModel<int, string, string, int?> Read(int id)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
                 @"select * from Post where Id=@Id", new { Id = id }).FirstOrDefault();
         }
 
-        public static List<PostModel<int, string, string, int>> ReadAll(string forum, int? thread, DateTime? since,
+        public static List<PostModel<int, string, string, int?>> ReadAll(string forum, int? thread, DateTime? since,
             string order, int? limit)
         {
-            var sql = "select * from Post where " +
+            var sql = "select * from Post where IsDeleted=false and " +
                 (thread == null ? "Forum=@Forum" : "Thread=@Thread") +
                 (since == null ? string.Empty : " and Date >= @Since") +
                 (order == null ? string.Empty : " order by Date " + order) +
                 (limit == null ? string.Empty : " limit @Limit");
 
-            var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+            var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
                 sql,
                 new
                 {

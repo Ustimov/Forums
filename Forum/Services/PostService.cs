@@ -20,10 +20,12 @@ namespace Forum.Services
             {
                 PostCrud.Create(request);
 
-                return new BaseResponse<PostModel<int, string, string, int>>
+                var post = PostCrud.Read(request);
+
+                return new BaseResponse<PostModel<int, string, string, int?>>
                 {
                     Code = StatusCode.Ok,
-                    Response = PostCrud.Read(request)
+                    Response = post,
                 };
             }
             catch(Exception e)
@@ -45,20 +47,20 @@ namespace Forum.Services
 
                 if (request.Related == null)
                 {
-                    return new BaseResponse<PostModel<int, string, string, int>> { Code = StatusCode.Ok, Response = post };
+                    return new BaseResponse<PostModel<int, string, string, int?>> { Code = StatusCode.Ok, Response = post };
                 }
                 else if (request.Related.Count == 3 && request.Related.Contains("user") &&
                     request.Related.Contains("thread") && request.Related.Contains("forum"))
                 {
-                    return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int>>
+                    return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int?>>
                     {
                         Code = StatusCode.Ok,
-                        Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int>
+                        Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int?>(post)
                         {
                             Thread = ThreadCrud.Read(post.Thread),
                             Forum = ForumCrud.Read(post.Forum),
                             User = UserCrud.Read(post.User),
-                            Parent = post.Parent,
+                            Parent = (post.Parent == 0 ? null : post.Parent),
                         },
                     };
                 }
@@ -66,10 +68,10 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("user") && request.Related.Contains("thread"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, UserModel, int>>
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, UserModel, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, string, UserModel, int>
+                            Response = new PostModel<ThreadModel<string, string>, string, UserModel, int?>(post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
@@ -80,10 +82,10 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("user") && request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<int, ForumModel<string>, UserModel, int>>
+                        return new BaseResponse<PostModel<int, ForumModel<string>, UserModel, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, ForumModel<string>, UserModel, int>
+                            Response = new PostModel<int, ForumModel<string>, UserModel, int?>(post)
                             {
                                 Thread = post.Id,
                                 Forum = ForumCrud.Read(post.Forum),
@@ -94,10 +96,10 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("thread") && request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int>>
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, string, int>
+                            Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, string, int?>(post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = ForumCrud.Read(post.Forum),
@@ -111,10 +113,10 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("user"))
                     {
-                        return new BaseResponse<PostModel<int, string, UserModel, int>>
+                        return new BaseResponse<PostModel<int, string, UserModel, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, string, UserModel, int>
+                            Response = new PostModel<int, string, UserModel, int?>(post)
                             {
                                 Thread = post.Thread,
                                 Forum = post.Forum,
@@ -125,10 +127,10 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("thread"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, string, int>>
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, string, string, int>
+                            Response = new PostModel<ThreadModel<string, string>, string, string, int?>(post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
@@ -139,10 +141,10 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<int, ForumModel<string>, string, int>>
+                        return new BaseResponse<PostModel<int, ForumModel<string>, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, ForumModel<string>, string, int>
+                            Response = new PostModel<int, ForumModel<string>, string, int?>(post)
                             {
                                 Thread = post.Thread,
                                 Forum = ForumCrud.Read(post.Forum),
@@ -167,7 +169,7 @@ namespace Forum.Services
             {
                 var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
 
-                return new BaseResponse<List<PostModel<int, string, string, int>>>
+                return new BaseResponse<List<PostModel<int, string, string, int?>>>
                 {
                     Code = StatusCode.Ok,
                     Response = posts
@@ -217,7 +219,7 @@ namespace Forum.Services
                     @"update Post set Message=@Message where Id=@Id",
                     new { Message = request.Message, Id = request.Post });
 
-                return new BaseResponse<PostModel<int, string, string, int>>
+                return new BaseResponse<PostModel<int, string, string, int?>>
                 {
                     Code = StatusCode.Ok,
                     Response = PostCrud.Read(request.Post),
@@ -242,7 +244,7 @@ namespace Forum.Services
                     @"update Post set Dislikes=Dislikes+1 where Id=@Id", new { Id = request.Post });
             }
 
-            return new BaseResponse<PostModel<int, string, string, int>>
+            return new BaseResponse<PostModel<int, string, string, int?>>
             {
                 Code = StatusCode.Ok,
                 Response = PostCrud.Read(request.Post),

@@ -37,9 +37,9 @@ namespace Forum.Helpers
                 new { ShortName = shortName }).FirstOrDefault();
         }
 
-        public static List<PostModel<int, string, string, int>> ReadPosts(ForumListPosts request)
+        public static List<PostModel<int, string, string, int?>> ReadPosts(ForumListPosts request)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
                 @"select * from Post", new { }
                 ).ToList();
         }

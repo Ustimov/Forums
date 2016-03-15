@@ -78,7 +78,7 @@ namespace Forum.Services
 
                 if (request.Related == null)
                 {
-                    return new BaseResponse<List<PostModel<int, string, string, int>>>
+                    return new BaseResponse<List<PostModel<int, string, string, int?>>>
                     {
                         Code = StatusCode.Ok,
                         Response = posts,
@@ -88,12 +88,12 @@ namespace Forum.Services
                     && request.Related.Contains("forum") && request.Related.Contains("user"))
                 {
                     var postWithThreadForumAndUser = new List<PostModel<ThreadModel<string, string>, ForumModel<string>,
-                        UserModel, int>>();
+                        UserModel, int?>>();
 
                     foreach (var post in posts)
                     {
                         postWithThreadForumAndUser.Add(new PostModel<ThreadModel<string, string>, ForumModel<string>,
-                            UserModel, int>
+                            UserModel, int?>
                         {
                             Thread = ThreadCrud.Read(post.Thread),
                             Forum = ForumCrud.Read(post.Forum),
@@ -102,7 +102,7 @@ namespace Forum.Services
                         });
                     }
 
-                    return new BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int>>>
+                    return new BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int?>>>
                     {
                         Code = StatusCode.Ok,
                         Response = postWithThreadForumAndUser,
@@ -113,12 +113,12 @@ namespace Forum.Services
                     if (request.Related.Contains("thread") && request.Related.Contains("forum"))
                     {
                         var postWithThreadAndForum = new List<PostModel<ThreadModel<string, string>, ForumModel<string>,
-                        string, int>>();
+                        string, int?>>();
 
                         foreach (var post in posts)
                         {
                             postWithThreadAndForum.Add(new PostModel<ThreadModel<string, string>, ForumModel<string>,
-                                string, int>
+                                string, int?>
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = ForumCrud.Read(post.Forum),
@@ -127,7 +127,7 @@ namespace Forum.Services
                             });
                         }
 
-                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int>>>
+                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int?>>>
                         {
                             Code = StatusCode.Ok,
                             Response = postWithThreadAndForum,
@@ -136,11 +136,11 @@ namespace Forum.Services
                     else if (request.Related.Contains("thread") && request.Related.Contains("user"))
                     {
                         var postWithThreadAndUser = new List<PostModel<ThreadModel<string, string>, string,
-                            UserModel, int>>();
+                            UserModel, int?>>();
 
                         foreach (var post in posts)
                         {
-                            postWithThreadAndUser.Add(new PostModel<ThreadModel<string, string>, string, UserModel, int>
+                            postWithThreadAndUser.Add(new PostModel<ThreadModel<string, string>, string, UserModel, int?>
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
@@ -149,7 +149,7 @@ namespace Forum.Services
                             });
                         }
 
-                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, string, UserModel, int>>>
+                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, string, UserModel, int?>>>
                         {
                             Code = StatusCode.Ok,
                             Response = postWithThreadAndUser,
@@ -158,11 +158,11 @@ namespace Forum.Services
                     else if (request.Related.Contains("user") && request.Related.Contains("forum"))
                     {
                         var postWithUserAndForum = new List<PostModel<int, ForumModel<string>,
-                            UserModel, int>>();
+                            UserModel, int?>>();
 
                         foreach (var post in posts)
                         {
-                            postWithUserAndForum.Add(new PostModel<int, ForumModel<string>, UserModel, int>
+                            postWithUserAndForum.Add(new PostModel<int, ForumModel<string>, UserModel, int?>
                             {
                                 Thread = post.Thread,
                                 Forum = ForumCrud.Read(post.Forum),
@@ -171,7 +171,7 @@ namespace Forum.Services
                             });
                         }
 
-                        return new BaseResponse<List<PostModel<int, ForumModel<string>, UserModel, int>>>
+                        return new BaseResponse<List<PostModel<int, ForumModel<string>, UserModel, int?>>>
                         {
                             Code = StatusCode.Ok,
                             Response = postWithUserAndForum,
@@ -182,11 +182,11 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("user"))
                     {
-                        var postWithUser = new List<PostModel<int, string, UserModel, int>>();
+                        var postWithUser = new List<PostModel<int, string, UserModel, int?>>();
 
                         foreach (var post in posts)
                         {
-                            postWithUser.Add(new PostModel<int, string, UserModel, int>
+                            postWithUser.Add(new PostModel<int, string, UserModel, int?>
                             {
                                 Thread = post.Thread,
                                 Forum = post.Forum,
@@ -195,7 +195,7 @@ namespace Forum.Services
                             });
                         }
 
-                        return new BaseResponse<List<PostModel<int, string, UserModel, int>>>
+                        return new BaseResponse<List<PostModel<int, string, UserModel, int?>>>
                         {
                             Code = StatusCode.Ok,
                             Response = postWithUser,
@@ -203,11 +203,11 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("forum"))
                     {
-                        var postWithForum = new List<PostModel<int, ForumModel<string>, string, int>>();
+                        var postWithForum = new List<PostModel<int, ForumModel<string>, string, int?>>();
 
                         foreach (var post in posts)
                         {
-                            postWithForum.Add(new PostModel<int, ForumModel<string>, string, int>
+                            postWithForum.Add(new PostModel<int, ForumModel<string>, string, int?>
                             {
                                 Thread = post.Thread,
                                 Forum = ForumCrud.Read(post.Forum),
@@ -216,7 +216,7 @@ namespace Forum.Services
                             });
                         }
 
-                        return new BaseResponse<List<PostModel<int, ForumModel<string>, string, int>>>
+                        return new BaseResponse<List<PostModel<int, ForumModel<string>, string, int?>>>
                         {
                             Code = StatusCode.Ok,
                             Response = postWithForum,
@@ -224,11 +224,11 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("thread"))
                     {
-                        var postWithThread = new List<PostModel<ThreadModel<string, string>, string, string, int>>();
+                        var postWithThread = new List<PostModel<ThreadModel<string, string>, string, string, int?>>();
 
                         foreach (var post in posts)
                         {
-                            postWithThread.Add(new PostModel<ThreadModel<string, string>, string, string, int>
+                            postWithThread.Add(new PostModel<ThreadModel<string, string>, string, string, int?>
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
@@ -237,7 +237,7 @@ namespace Forum.Services
                             });
                         }
 
-                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, string, string, int>>>
+                        return new BaseResponse<List<PostModel<ThreadModel<string, string>, string, string, int?>>>
                         {
                             Code = StatusCode.Ok,
                             Response = postWithThread,
@@ -335,7 +335,6 @@ namespace Forum.Services
         {
             try
             {
-                // TODO
                 return new BaseResponse<List<UserModel>> { Code = StatusCode.Ok, Response = UserCrud.ReadAll(request) };
             }
             catch (Exception e)

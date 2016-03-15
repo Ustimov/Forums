@@ -9,6 +9,7 @@ using Forum.Dtos.Thread;
 using Forum.Models;
 using Forum.Helpers;
 using Dapper;
+using MySql.Data.MySqlClient;
 
 namespace Forum.Services
 {
@@ -134,33 +135,22 @@ namespace Forum.Services
             }
         }
 
-        // Get posts from this thread
-        // thread/listPosts/?since=2014-01-02+00%3A00%3A00&limit=2&order=asc&thread=3
         public object Get(ThreadListPosts request)
         {
-            return new ListsPostsResponse
+            try
             {
-                Code = 0,
-                Response = new List<PostModel<int, string, string, int>>
+                var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
+
+                return new BaseResponse<List<PostModel<int, string, string, int?>>>
                 {
-                    new PostModel<int, string, string, int>
-                    {
-                        DateString = "2014-01-03 00:01:01",
-                        Dislikes = 0,
-                        Forum = "forum1",
-                        Id = 4,
-                        IsApproved = true,
-                        IsDeleted = false,
-                        IsEdited = false,
-                        IsHighlighted = false,
-                        IsSpam = false,
-                        Likes = 0,
-                        Message = "my message 1",
-                        Thread = 3,
-                        User = "example@mail.ru",
-                    }
-                },
-            };
+                    Code = StatusCode.Ok,
+                    Response = posts,
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
 
         public object Post(OpenThread request)
@@ -213,7 +203,7 @@ namespace Forum.Services
             try
             {
                 ConnectionProvider.DbConnection.Execute(
-                    @"insert into Subscribe values (User=@User, Thread=@Thread)",
+                    @"insert into Subscribe (User, Thread) values (@User, @Thread)",
                     new { User = request.User, Thread = request.Thread });
 
                 return new BaseResponse<BaseSubscribe>
@@ -222,9 +212,9 @@ namespace Forum.Services
                     Response = request,
                 };
             }
-            catch (Exception e)
+            catch (MySqlException e)
             {
-                throw;
+                return ErrorResponse.Generate(e);
             }
         }
 

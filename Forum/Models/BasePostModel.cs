@@ -11,7 +11,7 @@ namespace Forum.Models
         [DataMember(Name = "date")]
         public string DateString
         {
-            get { return Date.ToString("yyyy-MM-dd HH-mm-ss"); }
+            get { return Date.ToString("yyyy-MM-dd HH:mm:ss"); }
             set { Date = DateTime.Parse(value); }
         }
 

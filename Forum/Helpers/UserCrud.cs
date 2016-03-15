@@ -116,12 +116,10 @@ namespace Forum.Helpers
 
         public static List<UserModel> ReadAll(ForumListUsers request)
         {
-            throw new NotImplementedException();
-            // Get user with posts on this forum
             var users = ConnectionProvider.DbConnection.Query<UserModel>(
-                @"select * from User where Forum=@Forum" +
-                (request.SinceId == null ? string.Empty : " and Id >= @SinceId") +
-                (request.Order == null ? string.Empty : " order by Name " + request.Order) +
+                @"select * from Post p left join User u on p.User = u.Email where p.Forum=@Forum" +
+                (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId") +
+                (request.Order == null ? string.Empty : " order by u.Name " + request.Order) +
                 (request.Limit == null ? string.Empty : " limit @Limit"),
                 new
                 {

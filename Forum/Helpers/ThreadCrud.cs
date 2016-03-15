@@ -30,15 +30,28 @@ namespace Forum.Helpers
 
         public static ThreadModel<string, string> Read(int id)
         {
-            return ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+            var thread = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
                 @"select * from Thread where Id = @Id", new { Id = id }).FirstOrDefault();
+
+            if (thread != null)
+            {
+                thread.Posts = CountPosts(thread.Id);
+            }
+
+            return thread;
+        }
+
+        private static int CountPosts(int id)
+        {
+            return ConnectionProvider.DbConnection.ExecuteScalar<int>(
+                @"select count(*) from Post where Thread=@Id and IsDeleted=false", new { Id = id });
         }
 
         public static ThreadModel<string, string> Read(CreateThread request)
         {
-            return ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+            var thread = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
                 @"select * from Thread where Forum = @Forum and Title = @Title and IsClosed = @IsClosed and
-                User = @User and Date = @Date and Message = @Message and Slug = @Slug and IsDeleted = @IsDeleted", 
+                User = @User and Date = @Date and Message = @Message and Slug = @Slug and IsDeleted = @IsDeleted",
                 new
                 {
                     Forum = request.Forum,
@@ -50,13 +63,20 @@ namespace Forum.Helpers
                     Slug = request.Slug,
                     IsDeleted = request.IsDeleted,
                 }).FirstOrDefault();
+
+            if (thread != null)
+            {
+                thread.Posts = CountPosts(thread.Id);
+            }
+
+            return thread;
         }
 
         public static List<ThreadModel<string, string>> ReadAll(string forum, string user, DateTime? since,
             string order, int? limit)
         {
-            return ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
-                @"select * from Thread where " +
+            var threads = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+                @"select * from Thread where IsDeleted=false and " +
                 (user == null ? "Forum=@Forum" : "User=@User") +
                 (since == null ? string.Empty : " and Date >= @Since") +
                 (order == null ? string.Empty : " order by Date " + order) +
@@ -68,6 +88,13 @@ namespace Forum.Helpers
                     Since = since,
                     Limit = limit,
                 }).AsList();
+
+            foreach (var thread in threads)
+            {
+                thread.Posts = CountPosts(thread.Id);
+            }
+
+            return threads;
         }
 
         /*

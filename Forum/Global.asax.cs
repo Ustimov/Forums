@@ -1,14 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Security;
-using System.Web.SessionState;
 using ServiceStack.WebHost.Endpoints;
 using Forum.Services;
 using ServiceStack.Common.Web;
-using ServiceStack.ServiceHost;
-using ServiceStack.Common;
 using ServiceStack.Text;
 
 namespace Forum
@@ -28,8 +21,19 @@ namespace Forum
                 {
                     DefaultContentType = MimeTypes.Json,
                     //EnableFeatures = Feature.All.Remove(Feature.Metadata),
+                    //AppendUtf8CharsetOnContentTypes = new HashSet<string> { ContentType.Json }
                 });
                 JsConfig.IncludeNullValues = true;
+                /*
+                this.ResponseFilters.Add((req, res, dto) => {
+                    if (req.ResponseContentType == ContentType.Json)
+                    {
+                        req.
+                        res.AddHeader(HttpHeaders.ContentDisposition,
+                            string.Format("attachment;filename={0}.csv", req.OperationName));
+                    }
+                });
+                */
             }
         }
 
@@ -37,6 +41,7 @@ namespace Forum
         protected void Application_Start(object sender, EventArgs e)
         {
             new ForumAppHost().Init();
+            
         }
     }
 }

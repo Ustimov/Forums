@@ -19,12 +19,13 @@ namespace Forum
             var uid = "admin";
             var password = "admin";
             string connectionString;
-            connectionString = "SERVER=" + server + ";" + "PORT=3306" + ";" + "DATABASE=" +
-            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+            connectionString = "server=" + server + ";" + "port=3306" + ";" + "database=" +
+            database + ";" + "uid=" + uid + ";" + "pwd=" + password + ";" + "charset=utf8;";
 
             //port=3306
             //_connection = new MySqlConnection("Data Source=" + DbFile);
             _connection = new MySqlConnection(connectionString);
+            
             return _connection;
         }
 

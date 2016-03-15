@@ -73,7 +73,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class ListsPostsResponse : BaseResponse<List<PostModel<int, string, string, int>>>
+    public class ListsPostsResponse : BaseResponse<List<PostModel<int, string, string, int?>>>
     {
 
     }

@@ -101,7 +101,7 @@ namespace Forum.Services
                     (request.Order == null ? string.Empty : " order by Date " + request.Order) +
                     (request.Limit == null ? string.Empty : " limit @Limit");
 
-                var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int>>(
+                var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
                     sql,
                     new
                     {
@@ -110,7 +110,7 @@ namespace Forum.Services
                         Limit = request.Limit,
                     }).AsList();
 
-                return new BaseResponse<List<PostModel<int, string, string, int>>> { Code = StatusCode.Ok, Response = posts };
+                return new BaseResponse<List<PostModel<int, string, string, int?>>> { Code = StatusCode.Ok, Response = posts };
             }
             catch (Exception e)
             {
