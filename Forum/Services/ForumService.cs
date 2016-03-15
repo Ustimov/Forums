@@ -74,6 +74,8 @@ namespace Forum.Services
         // http://some.host.ru/db/api/forum/listPosts/?related=thread&related=forum&since=2014-01-01+00%3A00%3A00&order=desc&forum=forum1
         public object Get(ListPosts request)
         {
+            throw new NotImplementedException();
+
             return new ListPostsResponse
             {
                 Code = 0,
