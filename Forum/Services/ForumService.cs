@@ -93,7 +93,7 @@ namespace Forum.Services
                     foreach (var post in posts)
                     {
                         postWithThreadForumAndUser.Add(new PostModel<ThreadModel<string, string>, ForumModel<string>,
-                            UserModel, int?>
+                            UserModel, int?>(post)
                         {
                             Thread = ThreadCrud.Read(post.Thread),
                             Forum = ForumCrud.Read(post.Forum),
@@ -118,7 +118,7 @@ namespace Forum.Services
                         foreach (var post in posts)
                         {
                             postWithThreadAndForum.Add(new PostModel<ThreadModel<string, string>, ForumModel<string>,
-                                string, int?>
+                                string, int?>(post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = ForumCrud.Read(post.Forum),
@@ -141,6 +141,7 @@ namespace Forum.Services
                         foreach (var post in posts)
                         {
                             postWithThreadAndUser.Add(new PostModel<ThreadModel<string, string>, string, UserModel, int?>
+                                (post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
@@ -162,7 +163,7 @@ namespace Forum.Services
 
                         foreach (var post in posts)
                         {
-                            postWithUserAndForum.Add(new PostModel<int, ForumModel<string>, UserModel, int?>
+                            postWithUserAndForum.Add(new PostModel<int, ForumModel<string>, UserModel, int?>(post)
                             {
                                 Thread = post.Thread,
                                 Forum = ForumCrud.Read(post.Forum),
@@ -186,7 +187,7 @@ namespace Forum.Services
 
                         foreach (var post in posts)
                         {
-                            postWithUser.Add(new PostModel<int, string, UserModel, int?>
+                            postWithUser.Add(new PostModel<int, string, UserModel, int?>(post)
                             {
                                 Thread = post.Thread,
                                 Forum = post.Forum,
@@ -207,7 +208,7 @@ namespace Forum.Services
 
                         foreach (var post in posts)
                         {
-                            postWithForum.Add(new PostModel<int, ForumModel<string>, string, int?>
+                            postWithForum.Add(new PostModel<int, ForumModel<string>, string, int?>(post)
                             {
                                 Thread = post.Thread,
                                 Forum = ForumCrud.Read(post.Forum),
@@ -228,7 +229,7 @@ namespace Forum.Services
 
                         foreach (var post in posts)
                         {
-                            postWithThread.Add(new PostModel<ThreadModel<string, string>, string, string, int?>
+                            postWithThread.Add(new PostModel<ThreadModel<string, string>, string, string, int?>(post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,

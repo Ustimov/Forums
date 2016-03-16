@@ -88,6 +88,7 @@ namespace Forum.Helpers
             {
                 user.Followers = ReadFollowerEmails(user.Email);
                 user.Following = ReadFollowingEmails(user.Email);
+                user.Subscriptions = ReadSubscriptions(user.Email);
             }
 
             return users.ToList();
@@ -119,7 +120,7 @@ namespace Forum.Helpers
         public static List<UserModel> ReadAll(ForumListUsers request)
         {
             var users = ConnectionProvider.DbConnection.Query<UserModel>(
-                @"select * from Post p left join User u on p.User = u.Email where p.Forum=@Forum" +
+                @"select distinct u.* from Post p left join User u on p.User = u.Email where p.Forum=@Forum" +
                 (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId") +
                 (request.Order == null ? string.Empty : " order by u.Name " + request.Order) +
                 (request.Limit == null ? string.Empty : " limit @Limit"),
@@ -128,10 +129,14 @@ namespace Forum.Helpers
                     Forum = request.Forum,
                     SinceId = request.SinceId,
                     Limit = request.Limit,
-                }).AsList();
+                }).Distinct().AsList();
 
             foreach (var user in users)
             {
+                if (user.IsAnonymous)
+                {
+                    user.About = user.Name = user.Username = null;
+                }
                 user.Followers = ReadFollowerEmails(user.Email);
                 user.Following = ReadFollowingEmails(user.Email);
                 user.Subscriptions = ReadSubscriptions(user.Email);

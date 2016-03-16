@@ -139,7 +139,9 @@ namespace Forum.Services
         {
             try
             {
-                var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
+                var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit, true);
+
+                System.Diagnostics.Debug.WriteLine($"Thread: { request.Thread } | Order: { request.Order } | Count: { posts.Count }");
 
                 return new BaseResponse<List<PostModel<int, string, string, int?>>>
                 {

@@ -63,9 +63,9 @@ namespace Forum.Helpers
         }
 
         public static List<PostModel<int, string, string, int?>> ReadAll(string forum, int? thread, DateTime? since,
-            string order, int? limit)
+            string order, int? limit, bool isDeleted=false)
         {
-            var sql = "select * from Post where IsDeleted=false and " +
+            var sql = "select * from Post where " + (isDeleted == false ? "IsDeleted=false and " : string.Empty) +
                 (thread == null ? "Forum=@Forum" : "Thread=@Thread") +
                 (since == null ? string.Empty : " and Date >= @Since") +
                 (order == null ? string.Empty : " order by Date " + order) +
