@@ -70,6 +70,9 @@ namespace Forum.Dtos.Thread
         // Required
         [DataMember(Name = "thread")]
         public int Thread { get; set; }
+
+        [DataMember(Name = "sort")]
+        public string Sort { get; set; } = "flat";
     }
 
     [DataContract]

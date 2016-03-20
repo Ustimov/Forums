@@ -84,6 +84,25 @@ namespace Forum.Helpers
             return posts;
         }
 
+        public static List<int> ReadParents(string order, int? limit, DateTime? since, int thread)
+        {
+            return ConnectionProvider.DbConnection.Query<int>(
+                @"select Post from Path where IsDeleted=false and Thread=@Thread and char_length(Path)=10" + 
+                (since == null ? string.Empty : " and Date >= @Since") + 
+                " order by Path " + order +
+                (limit == null ? string.Empty : " limit @Limit"),
+                new { Limit = limit, Since = since, Thread = thread }).AsList();
+        }
+
+        public static List<int> ReadChilds(int root, int? limit, DateTime? since, int thread)
+        {
+            return ConnectionProvider.DbConnection.Query<int>(
+                @"select Post from Path where IsDeleted=false and Thread=@Thread and substring(Path, 1, 10)=@Root" +
+                " and Post!=@Post" + (since == null ? string.Empty : " and Date >= @Since") + " order by Path asc" +
+                (limit == null ? string.Empty : " limit @Limit"),
+                new { Limit = limit, Since = since, Thread = thread, Root = root.ToString("D10"), Post=root }).AsList();
+        }
+
         public static int Count()
         {
             return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Post").FirstOrDefault();

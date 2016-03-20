@@ -11,6 +11,7 @@ namespace Forum.Services
     {
         public object Post(Clear request)
         {
+            ConnectionProvider.DbConnection.Execute("delete from Path");
             ConnectionProvider.DbConnection.Execute("delete from Subscribe");
             ConnectionProvider.DbConnection.Execute("delete from Post");
             ConnectionProvider.DbConnection.Execute("delete from Thread");

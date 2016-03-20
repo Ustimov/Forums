@@ -139,9 +139,60 @@ namespace Forum.Services
         {
             try
             {
-                var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit, true);
+                List<PostModel<int, string, string, int?>> posts = new List<PostModel<int, string, string, int?>>();
 
-                System.Diagnostics.Debug.WriteLine($"Thread: { request.Thread } | Order: { request.Order } | Count: { posts.Count }");
+                if (request.Sort == "flat")
+                {
+                    posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since,
+                        request.Order, request.Limit, true);
+                }
+                else if (request.Sort == "tree")
+                {
+                    // TODO: Fix bug
+                    var ids = PostCrud.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
+
+                    foreach (var id in ids)
+                    {
+                        if (posts.Count == request.Limit)
+                        {
+                            break;
+                        }
+
+                        var post = PostCrud.Read(id);
+                        posts.Add(post);
+
+                        var childs = PostCrud.ReadChilds(post.Id, request.Limit, request.Since,
+                            request.Thread);
+
+                        foreach (var child in childs)
+                        {
+                            if (posts.Count == request.Limit)
+                            {
+                                break;
+                            }
+
+                            posts.Add(PostCrud.Read(child));
+                        }
+                    }
+                }
+                else if (request.Sort == "parent_tree")
+                {
+                    var ids = PostCrud.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
+
+                    foreach (var id in ids)
+                    {
+                        var post = PostCrud.Read(id);
+                        posts.Add(post);
+
+                        var childs = PostCrud.ReadChilds(post.Id, null, request.Since,
+                            request.Thread);
+
+                        foreach (var child in childs)
+                        {
+                            posts.Add(PostCrud.Read(child));
+                        }
+                    }
+                }
 
                 return new BaseResponse<List<PostModel<int, string, string, int?>>>
                 {
@@ -286,8 +337,6 @@ namespace Forum.Services
                     Code = StatusCode.Ok,
                     Response = ThreadCrud.Read(request.Thread),
                 };
-
-                //return new BaseResponse<string> { Code = StatusCode.UndefinedError, Response = "Undefined error" };
             }
             catch (Exception e)
             {

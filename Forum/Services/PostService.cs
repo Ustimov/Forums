@@ -22,6 +22,26 @@ namespace Forum.Services
 
                 var post = PostCrud.Read(request);
 
+                var parentPath = String.Empty;
+
+                if (request.Parent != null)
+                {
+                    parentPath = ConnectionProvider.DbConnection.ExecuteScalar<string>(
+                        @"select Path from Path where Post=@Post", new { Post = request.Parent });
+                }
+
+                ConnectionProvider.DbConnection.Execute(
+                    @"insert into Path (Post, Path, IsDeleted, Date, Thread)
+                    values (@Post, @Path, @IsDeleted, @Date, @Thread)",
+                    new
+                    {
+                        Post = post.Id,
+                        Path = (parentPath == String.Empty ? String.Empty : parentPath + ".") + post.Id.ToString("D10"),
+                        IsDeleted = post.IsDeleted,
+                        Date = post.Date,
+                        Thread = post.Thread,
+                    });
+
                 return new BaseResponse<PostModel<int, string, string, int?>>
                 {
                     Code = StatusCode.Ok,
@@ -188,6 +208,9 @@ namespace Forum.Services
                 ConnectionProvider.DbConnection.Execute(
                     @"update Post set IsDeleted=true where Id=@Id", new { Id = request.Post });
 
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Path set IsDeleted=true where Post=@Id", new { Id = request.Post });
+
                 return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Post };
             }
             catch (Exception e)
@@ -202,6 +225,9 @@ namespace Forum.Services
             {
                 ConnectionProvider.DbConnection.Execute(
                     @"update Post set IsDeleted=false where Id=@Id", new { Id = request.Post });
+
+                ConnectionProvider.DbConnection.Execute(
+                    @"update Path set IsDeleted=false where Post=@Id", new { Id = request.Post });
 
                 return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Post };
             }
