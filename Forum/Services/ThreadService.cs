@@ -135,6 +135,38 @@ namespace Forum.Services
             }
         }
 
+        private void AddPosts(List<PostModel<int, string, string, int?>> posts, int postId, DateTime? since, int thread,
+            string order, int? limit)
+        {
+            if (limit != null && limit == posts.Count)
+            {
+                return;
+            }
+
+            var exist = posts.Find((p) => p.Id == postId);
+            if (exist != null)
+            {
+                return;
+            }
+
+            var post = PostCrud.Read(postId);
+            posts.Add(post);
+
+            var path = PostCrud.ReadPath(post.Id);
+
+            var childs = PostCrud.ReadChilds(path, null, since, thread, order);
+
+            foreach (var child in childs)
+            {
+                if (limit != null && limit == posts.Count)
+                {
+                    return;
+                }
+
+                AddPosts(posts, child, since, thread, order, limit);
+            }
+        }
+
         public object Get(ThreadListPosts request)
         {
             try
@@ -152,25 +184,12 @@ namespace Forum.Services
 
                     foreach (var id in ids)
                     {
-                        if (posts.Count >= request.Limit)
+                        if (request.Limit != null && request.Limit == posts.Count)
                         {
                             break;
                         }
 
-                        var post = PostCrud.Read(id);
-                        posts.Add(post);
-
-                        var childs = PostCrud.ReadChilds(post.Id, null, request.Since,
-                            request.Thread, request.Order);
-
-                        foreach (var child in childs)
-                        {
-                            if (posts.Count >= request.Limit)
-                            {
-                                break;
-                            }
-                            posts.Add(PostCrud.Read(child));
-                        }
+                        AddPosts(posts, id, request.Since, request.Thread, request.Order, request.Limit);
                     }
                 }
                 else if (request.Sort == "parent_tree")
