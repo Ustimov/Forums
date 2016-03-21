@@ -4,6 +4,7 @@ using Forum.Models;
 using Forum.Dtos.Common;
 using Forum.Helpers;
 using Forum.Dtos.Base;
+using System;
 
 namespace Forum.Services
 {
@@ -24,17 +25,25 @@ namespace Forum.Services
 
         public object Get(Status request)
         {
-            return new BaseResponse<StatusResponseModel>
+            try
             {
-                Code = StatusCode.Ok,
-                Response = new StatusResponseModel
+                return new BaseResponse<StatusResponseModel>
                 {
-                    User = UserCrud.Count(),
-                    Thread = ThreadCrud.Count(),
-                    Forum = ForumCrud.Count(),
-                    Post = PostCrud.Count(),
-                },
-            };
+                    Code = StatusCode.Ok,
+                    Response = new StatusResponseModel
+                    {
+                        User = UserCrud.Count(),
+                        Thread = ThreadCrud.Count(),
+                        Forum = ForumCrud.Count(),
+                        Post = PostCrud.Count(),
+                    },
+                };
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+
         }
     }
 } 

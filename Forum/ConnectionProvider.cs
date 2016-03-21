@@ -12,7 +12,7 @@ namespace Forum
             get { return @"C:\Users\Ustimov\Documents\Visual Studio 2015\Projects\Forum\Forum\bin\forum.db"; }
         }
 
-        private static MySqlConnection Connect()
+        private static ServiceStack.MiniProfiler.Data.ProfiledDbConnection Connect()
         {
             var server = "localhost";
             var database = "forum";
@@ -25,11 +25,11 @@ namespace Forum
             //port=3306
             //_connection = new MySqlConnection("Data Source=" + DbFile);
             _connection = new MySqlConnection(connectionString);
-            
-            return _connection;
+
+            return new ServiceStack.MiniProfiler.Data.ProfiledDbConnection(_connection, ServiceStack.MiniProfiler.Profiler.Current);//_connection;
         }
 
-        public static MySqlConnection DbConnection
+        public static ServiceStack.MiniProfiler.Data.ProfiledDbConnection DbConnection
         {
             get { return Connect(); }
         }

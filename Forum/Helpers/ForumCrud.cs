@@ -46,7 +46,7 @@ namespace Forum.Helpers
 
         public static int Count()
         {
-            return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Forum").FirstOrDefault();
+            return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from Forum");
         }
     }
 }

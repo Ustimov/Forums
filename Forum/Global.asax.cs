@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using ServiceStack.Text;
 using ServiceStack.Text.WP;
 using ServiceStack.Common.Web;
+using ServiceStack.MiniProfiler;
 
 namespace Forum
 {
@@ -44,7 +45,17 @@ namespace Forum
         protected void Application_Start(object sender, EventArgs e)
         {
             new ForumAppHost().Init();
-            
+        }
+
+        protected void Application_BeginRequest(object src, EventArgs e)
+        {
+            if (Request.IsLocal)
+                Profiler.Start();
+        }
+
+        protected void Application_EndRequest(object src, EventArgs e)
+        {
+            Profiler.Stop();
         }
     }
 }

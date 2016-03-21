@@ -131,7 +131,7 @@ namespace Forum.Helpers
 
         public static int Count()
         {
-            return ConnectionProvider.DbConnection.Query<int>(@"select count (*) Post").FirstOrDefault();
+            return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from Post");
         }
     }
 }
