@@ -148,12 +148,11 @@ namespace Forum.Services
                 }
                 else if (request.Sort == "tree")
                 {
-                    // TODO: Fix bug
                     var ids = PostCrud.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
 
                     foreach (var id in ids)
                     {
-                        if (posts.Count == request.Limit)
+                        if (posts.Count >= request.Limit)
                         {
                             break;
                         }
@@ -161,16 +160,15 @@ namespace Forum.Services
                         var post = PostCrud.Read(id);
                         posts.Add(post);
 
-                        var childs = PostCrud.ReadChilds(post.Id, request.Limit, request.Since,
-                            request.Thread);
+                        var childs = PostCrud.ReadChilds(post.Id, null, request.Since,
+                            request.Thread, request.Order);
 
                         foreach (var child in childs)
                         {
-                            if (posts.Count == request.Limit)
+                            if (posts.Count >= request.Limit)
                             {
                                 break;
                             }
-
                             posts.Add(PostCrud.Read(child));
                         }
                     }
