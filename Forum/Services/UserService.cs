@@ -66,8 +66,6 @@ namespace Forum.Services
             {
                 var users = UserCrud.ReadFollowers(request);
 
-                System.Diagnostics.Debug.WriteLine($"{ request.Email } | { users.Count }");
-
                 return new BaseResponse<List<UserModel>>
                 {
                     Code = StatusCode.Ok,

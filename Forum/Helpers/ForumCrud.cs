@@ -22,7 +22,6 @@ namespace Forum.Helpers
                 });
         }
 
-        // TODO: related
         public static ForumModel<string> Read(ForumDetails request)
         {
             return ConnectionProvider.DbConnection.Query<ForumModel<string>>(
