@@ -1,139 +1,96 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ServiceStack.ServiceInterface;
 using Forum.Dtos.Base;
 using Forum.Dtos.Thread;
 using Forum.Models;
 using Forum.Helpers;
-using Dapper;
-using MySql.Data.MySqlClient;
 
 namespace Forum.Services
 {
     public class ThreadService : Service
     {
-        public object Post(CloseThread request)
+        public object Post(CloseThread ct)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Thread set IsClosed=true where Id=@Id", new { Id = request.Thread });
+                ConnectionProvider.DbConnection.CloseThread(ct);
 
-                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
+                return new CloseThreadResponse { Code = StatusCode.Ok, Response = ct.Thread };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.Ok, Response = e.Message };
             }
         }
 
-        public object Post(CreateThread request)
+        public object Post(CreateThread ct)
         {
             try
             {
-                ThreadCrud.Create(request);
+                var cnn = ConnectionProvider.DbConnection;
+                cnn.CreateThread(ct);
+                ct.Id = cnn.LastInsertId();
 
-                return new BaseResponse<ThreadModel<string, string>>
-                {
-                    Code = StatusCode.Ok,
-                    Response = ThreadCrud.Read(request)
-                };
+                return new CreateThreadResponse { Code = StatusCode.Ok, Response = ct };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Get(ThreadDetails request)
+        public object Get(ThreadDetails td)
         {
             try
             {
-                var thread = ConnectionProvider.DbConnection.ReadThread(request.Thread);
+                var cnn = ConnectionProvider.DbConnection;
+                var thread = cnn.ReadThread(td.Thread);
 
                 if (thread == null)
                 {
-                    return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Thread not found" };
+                    return new ErrorResponse { Code = StatusCode.ObjectNotFound, Response = "Thread Not Found" };
                 }
 
-                if (request.Related == null)
+                if (td.Related != null)
                 {
-                    return new BaseResponse<ThreadModel<string, string>>
+                    if (td.Related.Contains("user"))
                     {
-                        Code = StatusCode.Ok,
-                        Response = thread,
-                    };
-                }
-                else if (request.Related.Count == 2 && request.Related.Contains("user") && request.Related.Contains("forum"))
-                {
-                    return new BaseResponse<ThreadModel<ForumModel<object>, UserModel>>
-                    {
-                        Code = StatusCode.Ok,
-                        Response = new ThreadModel<ForumModel<object>, UserModel>(thread)
-                        {
-                            Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
-                            User = ConnectionProvider.DbConnection.ReadUser(thread.User),
-                        },
-                    };
-                }
-                else if (request.Related.Count == 1)
-                {
-                    if (request.Related.Contains("forum"))
-                    {
-                        return new BaseResponse<ThreadModel<ForumModel<object>, string>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new ThreadModel<ForumModel<object>, string>(thread)
-                            {
-                                Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
-                                User = thread.User,
-                            },
-                        };
+                        thread.User = cnn.ReadUser(thread.User as string);
                     }
-                    else if (request.Related.Contains("user"))
+
+                    if (td.Related.Contains("forum"))
                     {
-                        return new BaseResponse<ThreadModel<string, UserModel>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new ThreadModel<string, UserModel>(thread)
-                            {
-                                Forum = thread.Forum,
-                                User = ConnectionProvider.DbConnection.ReadUser(thread.User),
-                            },
-                        };
+                        thread.Forum = cnn.ReadForum(thread.Forum as string);
                     }
                 }
 
-                return new BaseResponse<string>
-                {
-                    Code = StatusCode.IncorrectRequest,
-                    Response = "Incorrect request",
-                };
+                return new ThreadDetailsResponse { Code = StatusCode.Ok, Response = thread };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Get(ThreadListThreads request)
+        public object Get(ThreadListThreads tlt)
         {
             try
             {   
-                return new BaseResponse<List<ThreadModel<object, object>>>
+                return new ThreadListThreadsResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = ConnectionProvider.DbConnection.ReadAllThreads(request.Forum, request.User, request.Since, request.Order, request.Limit),
+                    Response = ConnectionProvider.DbConnection.ReadAllThreads(
+                        tlt.Forum, tlt.User, tlt.Since, tlt.Order, tlt.Limit),
                 };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
+
+        #region NEED REFACTOR
 
         private void AddPosts(List<PostModel<object, object, object, object>> posts, int postId, DateTime? since, int thread,
             string order, int? limit)
@@ -223,114 +180,98 @@ namespace Forum.Services
             }
         }
 
-        public object Post(OpenThread request)
+        #endregion
+
+        public object Post(OpenThread ot)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Thread set IsClosed=false where Id=@Id", new { Id = request.Thread });
+                ConnectionProvider.DbConnection.OpenThread(ot);
 
-                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
+                return new OpenThreadResponse { Code = StatusCode.Ok, Response = ot.Thread };
             }
             catch (Exception e)
-            {
-                throw;
-            }
-        }
-
-        public object Post(RemoveThread request)
-        {
-            try
-            {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Thread set IsDeleted=true where Id=@Id", new { Id = request.Thread });
-
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set IsDeleted=true where Thread=@Id", new { Id = request.Thread });
-
-                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-        }
-
-        public object Post(RestoreThread request)
-        {
-            try
-            {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Thread set IsDeleted=false where Id=@Id", new { Id = request.Thread });
-
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set IsDeleted=false where Thread=@Id", new { Id = request.Thread });
-
-                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Thread };
-            }
-            catch (Exception e)
-            {
-                throw;
-            }
-        }
-
-        public object Post(Subscribe request)
-        {
-            try
-            {
-                ConnectionProvider.DbConnection.Execute(
-                    @"insert into Subscribe (User, Thread) values (@User, @Thread)",
-                    new { User = request.User, Thread = request.Thread });
-
-                return new BaseResponse<BaseSubscribe>
-                {
-                    Code = StatusCode.Ok,
-                    Response = request,
-                };
-            }
-            catch (MySqlException e)
             {
                 return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Post(Unsubscribe request)
+        public object Post(RemoveThread rt)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"delete from Subscribe where User=@User and Thread=@Thread",
-                    new { User = request.User, Thread = request.Thread });
+                var cnn = ConnectionProvider.DbConnection;
+                cnn.RemoveThread(rt);
+                cnn.RemovePosts(rt);
 
-                return new BaseResponse<BaseSubscribe>
-                {
-                    Code = StatusCode.Ok,
-                    Response = request,
-                };
+                return new RemoveThreadResponse { Code = StatusCode.Ok, Response = rt.Thread };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Post(UpdateThread request)
+        public object Post(RestoreThread rt)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Thread set Message=@Message, Slug=@Slug where Id=@Id",
-                    new { Message = request.Message, Slug = request.Slug, Id = request.Thread });
+                var cnn = ConnectionProvider.DbConnection;
+                cnn.RestoreThread(rt);
+                cnn.RestorePosts(rt);
 
-                return new BaseResponse<ThreadModel<string, string>>
+                return new RestoreThreadResponse { Code = StatusCode.Ok, Response = rt.Thread };
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
+            }
+        }
+
+        public object Post(Subscribe u)
+        {
+            try
+            {
+                ConnectionProvider.DbConnection.Subscribe(u);
+
+                return new SubscribeResponse { Code = StatusCode.Ok, Response = u };
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
+            }
+        }
+
+        public object Post(Unsubscribe u)
+        {
+            try
+            {
+                ConnectionProvider.DbConnection.Unsubscribe(u);
+
+                return new UnsubscribeResponse { Code = StatusCode.Ok, Response = u };
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
+            }
+        }
+
+        public object Post(UpdateThread ut)
+        {
+            try
+            {
+                var cnn = ConnectionProvider.DbConnection;
+                cnn.UpdateThread(ut);
+
+                return new UpdateThreadResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = ConnectionProvider.DbConnection.ReadThread(request.Thread),
+                    Response = cnn.ReadThread(ut.Thread),
                 };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
@@ -338,26 +279,26 @@ namespace Forum.Services
         {
             try
             {
+                var cnn = ConnectionProvider.DbConnection;
+
                 if (request.Value == 1)
                 {
-                    ConnectionProvider.DbConnection.Execute(
-                        @"update Thread set Likes=Likes+1 where Id=@Id", new { Id = request.Thread });
+                    cnn.LikeThread(request);
                 }
                 else if (request.Value == -1)
                 {
-                    ConnectionProvider.DbConnection.Execute(
-                        @"update Thread set Dislikes=Dislikes+1 where Id=@Id", new { Id = request.Thread });
+                    cnn.DislikeThread(request);
                 }
 
-                return new BaseResponse<ThreadModel<string, string>>
+                return new VoteThreadResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = ConnectionProvider.DbConnection.ReadThread(request.Thread),
+                    Response = cnn.ReadThread(request.Thread),
                 };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
     }

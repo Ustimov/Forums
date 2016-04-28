@@ -15,7 +15,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class CloseResponse : BaseResponse<BaseThread>
+    public class CloseThreadResponse : BaseResponse<int>
     {
 
     }
@@ -29,7 +29,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class CreateResponse : BaseResponse<ThreadModel<string, string>>
+    public class CreateThreadResponse : BaseResponse<ThreadModel<string, string>>
     {
 
     }
@@ -89,7 +89,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class OpenResponse : BaseResponse<BaseThread>
+    public class OpenThreadResponse : BaseResponse<int>
     {
 
     }
@@ -102,7 +102,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class RemoveResponse : BaseResponse<BaseThread>
+    public class RemoveThreadResponse : BaseResponse<int>
     {
 
     }
@@ -115,7 +115,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class RestoreResponse : BaseResponse<BaseThread>
+    public class RestoreThreadResponse : BaseResponse<int>
     {
 
     }
@@ -160,7 +160,7 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class UpdateResponse : BaseResponse<ThreadModel<string, string>>
+    public class UpdateThreadResponse : BaseResponse<ThreadModel<object, object>>
     {
 
     }
@@ -175,7 +175,19 @@ namespace Forum.Dtos.Thread
     }
 
     [DataContract]
-    public class VoteResponse : BaseResponse<ThreadModel<string, string>>
+    public class VoteThreadResponse : BaseResponse<ThreadModel<object, object>>
+    {
+
+    }
+
+    [DataContract]
+    public class ThreadListThreadsResponse : BaseResponse<List<ThreadModel<object, object>>>
+    {
+
+    }
+
+    [DataContract]
+    public class ThreadDetailsResponse : BaseResponse<ThreadModel<object, object>>
     {
 
     }

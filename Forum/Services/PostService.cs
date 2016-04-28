@@ -68,10 +68,10 @@ namespace Forum.Services
                 else if (request.Related.Count == 3 && request.Related.Contains("user") &&
                     request.Related.Contains("thread") && request.Related.Contains("forum"))
                 {
-                    return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<object>, UserModel, int?>>
+                    return new BaseResponse<PostModel<ThreadModel<object, object>, ForumModel<object>, UserModel, int?>>
                     {
                         Code = StatusCode.Ok,
-                        Response = new PostModel<ThreadModel<string, string>, ForumModel<object>, UserModel, int?>(post)
+                        Response = new PostModel<ThreadModel<object, object>, ForumModel<object>, UserModel, int?>(post)
                         {
                             Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
                             Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
@@ -85,10 +85,10 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("user") && request.Related.Contains("thread"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, UserModel, int?>>
+                        return new BaseResponse<PostModel<ThreadModel<object, object>, string, UserModel, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, string, UserModel, int?>(post)
+                            Response = new PostModel<ThreadModel<object, object>, string, UserModel, int?>(post)
                             {
                                 Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
                                 Forum = post.Forum as string,
@@ -113,10 +113,10 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("thread") && request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<object>, string, int?>>
+                        return new BaseResponse<PostModel<ThreadModel<object, object>, ForumModel<object>, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, ForumModel<object>, string, int?>(post)
+                            Response = new PostModel<ThreadModel<object, object>, ForumModel<object>, string, int?>(post)
                             {
                                 Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
                                 Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
@@ -144,10 +144,10 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("thread"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, string, string, int?>>
+                        return new BaseResponse<PostModel<ThreadModel<object, object>, string, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, string, string, int?>(post)
+                            Response = new PostModel<ThreadModel<object, object>, string, string, int?>(post)
                             {
                                 Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
                                 Forum = post.Forum as string,
