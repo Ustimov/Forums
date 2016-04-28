@@ -87,7 +87,7 @@ namespace Forum.Helpers
         public static List<int> ReadParents(string order, int? limit, DateTime? since, int thread)
         {
             return ConnectionProvider.DbConnection.Query<int>(
-                @"select Post from Path where IsDeleted=false and Thread=@Thread and char_length(Path)=10" + 
+                @"select Id from Post where IsDeleted=false and Thread=@Thread and char_length(Path)=10" + 
                 (since == null ? string.Empty : " and Date >= @Since") + 
                 " order by Path " + order +
                 (limit == null ? string.Empty : " limit @Limit"),
@@ -97,8 +97,8 @@ namespace Forum.Helpers
         public static List<int> ReadChilds(string root, int? limit, DateTime? since, int thread, string order)
         {
             return ConnectionProvider.DbConnection.Query<int>(
-                @"select Post from Path where IsDeleted=false and Thread=@Thread and substring(Path, 1, @Length)=@Root" +
-                " and Post!=@Post" + (since == null ? string.Empty : " and Date >= @Since") + 
+                @"select Id from Post where IsDeleted=false and Thread=@Thread and substring(Path, 1, @Length)=@Root" +
+                " and Id!=@Post" + (since == null ? string.Empty : " and Date >= @Since") + 
                 " order by char_length(Path) asc, Path " + order + (limit == null ? string.Empty : " limit @Limit"),
                 new { Limit = limit, Since = since, Thread = thread, Root = root, Post = root, Length = root.Length})
                 .AsList();
@@ -107,8 +107,8 @@ namespace Forum.Helpers
         public static List<int> ReadChilds(int root, int? limit, DateTime? since, int thread)
         {
             return ConnectionProvider.DbConnection.Query<int>(
-                @"select Post from Path where IsDeleted=false and Thread=@Thread and substring(Path, 1, 10)=@Root" +
-                " and Post!=@Post" + (since == null ? string.Empty : " and Date >= @Since") + " order by Path " +
+                @"select Id from Post where IsDeleted=false and Thread=@Thread and substring(Path, 1, 10)=@Root" +
+                " and Id!=@Post" + (since == null ? string.Empty : " and Date >= @Since") + " order by Path " +
                 (limit == null ? string.Empty : " limit @Limit"),
                 new { Limit = limit, Since = since, Thread = thread, Root = root.ToString("D10"), Post = root }).AsList();
         }
@@ -116,7 +116,7 @@ namespace Forum.Helpers
         public static List<int> ReadParentsAndChilds(string order, int? limit, DateTime? since, int thread)
         {
             return ConnectionProvider.DbConnection.Query<int>(
-                @"select Post from Path where IsDeleted=false and Thread=@Thread" +
+                @"select Id from Post where IsDeleted=false and Thread=@Thread" +
                 (since == null ? string.Empty : " and Date >= @Since") +
                 " order by Path " + order +
                 (limit == null ? string.Empty : " limit @Limit"),
@@ -126,7 +126,7 @@ namespace Forum.Helpers
         public static string ReadPath(int id)
         {
             return ConnectionProvider.DbConnection.ExecuteScalar<string>(
-                @"select Path from Path where Post=@Post", new { Post = id });
+                @"select Path from Post where Id=@Post", new { Post = id });
         }
 
         public static int Count()
