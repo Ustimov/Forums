@@ -16,7 +16,7 @@ namespace Forum.Models
         }
 
         [DataMember(Name = "dislikes")]
-        public int Dislikes { get; set; }
+        public int Dislikes { get; set; } = 0;
 
         [DataMember(Name = "id")]
         public int Id { get; set; }
@@ -37,7 +37,7 @@ namespace Forum.Models
         public bool IsSpam { get; set; }
 
         [DataMember(Name = "likes")]
-        public int Likes { get; set; }
+        public int Likes { get; set; } = 0;
 
         [DataMember(Name = "message")]
         public string Message { get; set; }

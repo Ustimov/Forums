@@ -12,7 +12,7 @@ using System.Data.Common;
 
 namespace Forum.Helpers
 {
-    public static class UserCrud
+    public static class UserExtensions
     {
         public static void CreateUser(this IDbConnection cnn, UserModel user)
         {

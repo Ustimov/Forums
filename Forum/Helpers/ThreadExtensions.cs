@@ -9,7 +9,7 @@ using System.Data;
 
 namespace Forum.Helpers
 {
-    public static class ThreadCrud
+    public static class ThreadExtensions
     {
         public static void CreateThread(this IDbConnection cnn, CreateThread request)
         {

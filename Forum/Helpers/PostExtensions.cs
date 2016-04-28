@@ -1,38 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Data;
 using Dapper;
 using Forum.Dtos.Post;
 using Forum.Models;
-using System.Data;
 
 namespace Forum.Helpers
 {
-    public static class PostCrud
+    public static class PostExtensions
     {
-        public static void CreatePost(this IDbConnection cnn, CreatePost request)
+        public static void CreatePost(this IDbConnection cnn, CreatePost cp)
         {
-            cnn.Execute(
-                @"insert into Post 
-                (Parent, IsApproved, IsHighlighted, IsEdited, IsSpam, IsDeleted, Date, Thread, Message, User, Forum,
-                Likes, Dislikes)
-                values (@Parent, @IsApproved, @IsHighlighted, @IsEdited, @IsSpam, @IsDeleted, @Date, @Thread,
-                @Message, @User, @Forum, 0, 0)",
-                new
-                {
-                    Parent = request.Parent,
-                    IsApproved = request.IsApproved,
-                    IsHighlighted = request.IsHighlighted,
-                    IsEdited = request.IsEdited,
-                    IsSpam = request.IsSpam,
-                    IsDeleted = request.IsDeleted,
-                    Date = request.Date,
-                    Thread = request.Thread,
-                    Message = request.Message,
-                    User = request.User,
-                    Forum = request.Forum,
-                });
+            cnn.Execute(@"INSERT INTO Post (Parent, IsApproved, IsHighlighted, IsEdited,
+                IsSpam, IsDeleted, Date, Thread, Message, User, Forum, Likes, Dislikes)
+                VALUES (@Parent, @IsApproved, @IsHighlighted, @IsEdited, @IsSpam, @IsDeleted,
+                @Date, @Thread, @Message, @User, @Forum, @Likes, @Dislikes)", cp);
         }
 
         public static PostModel<int, string, string, int?> Read(CreatePost request)

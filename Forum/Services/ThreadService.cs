@@ -114,9 +114,9 @@ namespace Forum.Services
             var post = ConnectionProvider.DbConnection.ReadPost(postId);
             posts.Add(post);
 
-            var path = PostCrud.ReadPath(post.Id);
+            var path = PostExtensions.ReadPath(post.Id);
 
-            var childs = PostCrud.ReadChilds(path, null, since, thread, order);
+            var childs = PostExtensions.ReadChilds(path, null, since, thread, order);
 
             foreach (var child in childs)
             {
@@ -142,7 +142,7 @@ namespace Forum.Services
                 }
                 else if (request.Sort == "tree")
                 {
-                    var ids = PostCrud.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
+                    var ids = PostExtensions.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
 
                     foreach (var id in ids)
                     {
@@ -156,14 +156,14 @@ namespace Forum.Services
                 }
                 else if (request.Sort == "parent_tree")
                 {
-                    var ids = PostCrud.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
+                    var ids = PostExtensions.ReadParents(request.Order, request.Limit, request.Since, request.Thread);
 
                     foreach (var id in ids)
                     {
                         var post = ConnectionProvider.DbConnection.ReadPost(id);
                         posts.Add(post);
 
-                        var childs = PostCrud.ReadChilds(post.Id, null, request.Since,
+                        var childs = PostExtensions.ReadChilds(post.Id, null, request.Since,
                             request.Thread);
 
                         foreach (var child in childs)

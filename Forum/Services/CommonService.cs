@@ -31,10 +31,10 @@ namespace Forum.Services
                     Code = StatusCode.Ok,
                     Response = new StatusResponseModel
                     {
-                        User = UserCrud.Count(),
-                        Thread = ThreadCrud.Count(),
+                        User = UserExtensions.Count(),
+                        Thread = ThreadExtensions.Count(),
                         Forum = ForumExtensions.Count(),
-                        Post = PostCrud.Count(),
+                        Post = PostExtensions.Count(),
                     },
                 };
             }

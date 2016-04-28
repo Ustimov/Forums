@@ -119,11 +119,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\CommonExtensions.cs" />
-    <Compile Include="Helpers\ErrorResponse.cs" />
     <Compile Include="Helpers\ForumExtensions.cs" />
-    <Compile Include="Helpers\PostCrud.cs" />
-    <Compile Include="Helpers\ThreadCrud.cs" />
-    <Compile Include="Helpers\UserCrud.cs" />
+    <Compile Include="Helpers\PostExtensions.cs" />
+    <Compile Include="Helpers\ThreadExtensions.cs" />
+    <Compile Include="Helpers\UserExtensions.cs" />
     <Compile Include="Dtos\BaseDtos.cs" />
     <Compile Include="Dtos\CommonDtos.cs" />
     <Compile Include="Dtos\ForumDtos.cs" />
