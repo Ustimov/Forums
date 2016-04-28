@@ -16,23 +16,14 @@ namespace Forum.Services
                 cnn.CreatePost(cp);
                 cp.Id = cnn.LastInsertId();
 
-                /*
                 var parentPath = String.Empty;
 
-                if (request.Parent != null)
+                if (cp.Parent != null)
                 {
-                    parentPath = ConnectionProvider.DbConnection.ExecuteScalar<string>(
-                        @"select Path from Post where Id=@Post", new { Post = request.Parent });
+                    parentPath = cnn.ReadPath(cp);
                 }
 
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set Path=@Path where Id=@Post",
-                    new
-                    {
-                        Post = post.Id,
-                        Path = (parentPath == String.Empty ? String.Empty : parentPath + ".") + post.Id.ToString("D10"),
-                    });
-                */
+                cnn.UpdatePath(cp.Id, parentPath);
 
                 return new CreatePostResponse
                 {

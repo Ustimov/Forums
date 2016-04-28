@@ -155,6 +155,21 @@ namespace Forum.Helpers
             cnn.Execute(@"UPDATE Post SET IsDeleted=true WHERE Id=@Post", rp);
         }
 
+        public static string ReadPath(this IDbConnection cnn, CreatePost cp)
+        {
+            return cnn.ExecuteScalar<string>(@"SELECT Path FROM Post WHERE Id=@Parent", cp);
+        }
+
+        public static void UpdatePath(this IDbConnection cnn, int id, string parentPath)
+        {
+            cnn.Execute(@"UPDATE Post SET Path=@Path WHERE Id=@Id",
+                new
+                {
+                    Id = id,
+                    Path = (parentPath == String.Empty ? String.Empty : parentPath + ".") + id.ToString("D10"),
+                });
+        }
+
         public static int Count()
         {
             return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from Post");
