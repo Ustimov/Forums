@@ -69,12 +69,12 @@ namespace Forum.Services
                 }
                 else if (request.Related.Count == 2 && request.Related.Contains("user") && request.Related.Contains("forum"))
                 {
-                    return new BaseResponse<ThreadModel<ForumModel<string>, UserModel>>
+                    return new BaseResponse<ThreadModel<ForumModel<object>, UserModel>>
                     {
                         Code = StatusCode.Ok,
-                        Response = new ThreadModel<ForumModel<string>, UserModel>(thread)
+                        Response = new ThreadModel<ForumModel<object>, UserModel>(thread)
                         {
-                            Forum = ForumCrud.Read(thread.Forum),
+                            Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
                             User = UserCrud.Read(thread.User),
                         },
                     };
@@ -83,12 +83,12 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<ThreadModel<ForumModel<string>, string>>
+                        return new BaseResponse<ThreadModel<ForumModel<object>, string>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new ThreadModel<ForumModel<string>, string>(thread)
+                            Response = new ThreadModel<ForumModel<object>, string>(thread)
                             {
-                                Forum = ForumCrud.Read(thread.Forum),
+                                Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
                                 User = thread.User,
                             },
                         };
@@ -290,7 +290,7 @@ namespace Forum.Services
             }
             catch (MySqlException e)
             {
-                return ErrorResponse.Generate(e);
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 

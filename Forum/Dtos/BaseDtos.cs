@@ -81,4 +81,10 @@ namespace Forum.Dtos.Base
         [DataMember(Name = "user")]
         public string User { get; set; }
     }
+
+    [DataContract]
+    public class ErrorResponse : BaseResponse<string>
+    {
+
+    }
 }

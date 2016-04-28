@@ -33,7 +33,7 @@ namespace Forum.Services
                     {
                         User = UserCrud.Count(),
                         Thread = ThreadCrud.Count(),
-                        Forum = ForumCrud.Count(),
+                        Forum = ForumExtensions.Count(),
                         Post = PostCrud.Count(),
                     },
                 };

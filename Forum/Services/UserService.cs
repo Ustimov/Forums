@@ -26,7 +26,7 @@ namespace Forum.Services
             }
             catch (MySqlException e)
             {
-                return ErrorResponse.Generate(e);
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
@@ -148,7 +148,7 @@ namespace Forum.Services
             }
             catch(MySqlException e)
             {
-                return ErrorResponse.Generate(e);
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
     }

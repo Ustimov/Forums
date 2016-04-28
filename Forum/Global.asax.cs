@@ -28,6 +28,7 @@ namespace Forum
                 });
                 JsConfig.IncludeNullValues = true;
                 JsConfig.EscapeUnicode = true;
+                JsConfig.ExcludeTypeInfo = true;
                 /*
                 this.ResponseFilters.Add((req, res, dto) => {
                     if (req.ResponseContentType == ContentType.Json)

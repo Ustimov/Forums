@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Forum.Helpers
 {
+    /*
     public static class ErrorResponse
     {
         public static BaseResponse<string> Generate(MySqlException e)
@@ -21,4 +22,5 @@ namespace Forum.Helpers
             }
         }
     }
+    */
 }

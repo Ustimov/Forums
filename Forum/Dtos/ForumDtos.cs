@@ -10,8 +10,9 @@ namespace Forum.Dtos.Forum
     // All params are required
     [Route("/db/api/forum/create/")]
     [DataContract]
-    public class CreateForum
+    public class CreateForum : ForumModel<string>
     {
+        /*
         [DataMember(Name = "name")]
         public string Name { get; set; }
 
@@ -20,6 +21,7 @@ namespace Forum.Dtos.Forum
 
         [DataMember(Name = "user")]
         public string User { get; set; }
+        */
     }
 
     [DataContract]
@@ -32,11 +34,9 @@ namespace Forum.Dtos.Forum
     [DataContract]
     public class ForumDetails
     {
-        // Optional
         [DataMember(Name = "related")]
         public List<string> Related { get; set; }
 
-        // Required
         [DataMember(Name = "forum")]
         public string Forum { get; set; }
     }
@@ -99,6 +99,18 @@ namespace Forum.Dtos.Forum
 
     [DataContract]
     public class ListUsersResponse : BaseResponse<List<UserModel>>
+    {
+
+    }
+
+    [DataContract]
+    public class CreateForumResponse : BaseResponse<ForumModel<string>>
+    {
+
+    }
+
+    [DataContract]
+    public class ForumDetailsResponse : BaseResponse<ForumModel<object>>
     {
 
     }

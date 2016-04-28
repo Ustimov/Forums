@@ -118,8 +118,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\CommonExtensions.cs" />
     <Compile Include="Helpers\ErrorResponse.cs" />
-    <Compile Include="Helpers\ForumCrud.cs" />
+    <Compile Include="Helpers\ForumExtensions.cs" />
     <Compile Include="Helpers\PostCrud.cs" />
     <Compile Include="Helpers\ThreadCrud.cs" />
     <Compile Include="Helpers\UserCrud.cs" />

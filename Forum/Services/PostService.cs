@@ -68,13 +68,13 @@ namespace Forum.Services
                 else if (request.Related.Count == 3 && request.Related.Contains("user") &&
                     request.Related.Contains("thread") && request.Related.Contains("forum"))
                 {
-                    return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int?>>
+                    return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<object>, UserModel, int?>>
                     {
                         Code = StatusCode.Ok,
-                        Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, UserModel, int?>(post)
+                        Response = new PostModel<ThreadModel<string, string>, ForumModel<object>, UserModel, int?>(post)
                         {
                             Thread = ThreadCrud.Read(post.Thread),
-                            Forum = ForumCrud.Read(post.Forum),
+                            Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
                             User = UserCrud.Read(post.User),
                             Parent = (post.Parent == 0 ? null : post.Parent),
                         },
@@ -98,13 +98,13 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("user") && request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<int, ForumModel<string>, UserModel, int?>>
+                        return new BaseResponse<PostModel<int, ForumModel<object>, UserModel, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, ForumModel<string>, UserModel, int?>(post)
+                            Response = new PostModel<int, ForumModel<object>, UserModel, int?>(post)
                             {
                                 Thread = post.Id,
-                                Forum = ForumCrud.Read(post.Forum),
+                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
                                 User = UserCrud.Read(post.User),
                                 Parent = post.Parent,
                             },
@@ -112,13 +112,13 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("thread") && request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<string>, string, int?>>
+                        return new BaseResponse<PostModel<ThreadModel<string, string>, ForumModel<object>, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<string, string>, ForumModel<string>, string, int?>(post)
+                            Response = new PostModel<ThreadModel<string, string>, ForumModel<object>, string, int?>(post)
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
-                                Forum = ForumCrud.Read(post.Forum),
+                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
                                 User = post.User,
                                 Parent = post.Parent,
                             },
@@ -157,13 +157,13 @@ namespace Forum.Services
                     }
                     else if (request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<int, ForumModel<string>, string, int?>>
+                        return new BaseResponse<PostModel<int, ForumModel<object>, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, ForumModel<string>, string, int?>(post)
+                            Response = new PostModel<int, ForumModel<object>, string, int?>(post)
                             {
                                 Thread = post.Thread,
-                                Forum = ForumCrud.Read(post.Forum),
+                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
                                 User = post.User,
                                 Parent = post.Parent,
                             },
