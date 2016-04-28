@@ -5,6 +5,7 @@ using Forum.Dtos.Base;
 using Forum.Dtos.User;
 using Forum.Models;
 using Forum.Helpers;
+using MySql.Data.MySqlClient;
 
 namespace Forum.Services
 {
@@ -19,6 +20,10 @@ namespace Forum.Services
                 cu.Id = cnn.LastInsertId();
 
                 return new CreateUserResponse { Code = StatusCode.Ok, Response = cu };
+            }
+            catch (MySqlException e)
+            {
+                return new ErrorResponse { Code = StatusCode.UserAlreadyExists, Response = e.Message };
             }
             catch (Exception e)
             {
@@ -50,10 +55,13 @@ namespace Forum.Services
         {
             try
             {
+                var cnn = ConnectionProvider.DbConnection;
+                cnn.Follow(f);
+
                 return new FollowResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = ConnectionProvider.DbConnection.ReadUser(f.Follower),
+                    Response = cnn.ReadUser(f.Follower),
                 };
             }
             catch (Exception e)

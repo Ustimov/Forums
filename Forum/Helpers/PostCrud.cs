@@ -137,7 +137,7 @@ namespace Forum.Helpers
 
         public static void DislikePost(this IDbConnection cnn, VotePost vp)
         {
-            cnn.Execute(@"UPDATE Post SET Dislikes=Dislikes+1 WHERE Id=@Id", vp);
+            cnn.Execute(@"UPDATE Post SET Dislikes=Dislikes+1 WHERE Id=@Post", vp);
         }
 
         public static void UpdatePost(this IDbConnection cnn, UpdatePost up)

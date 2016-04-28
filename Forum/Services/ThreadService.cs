@@ -54,6 +54,11 @@ namespace Forum.Services
 
                 if (td.Related != null)
                 {
+                    if (td.Related.Contains("thread"))
+                    {
+                        return new ErrorResponse { Code = StatusCode.IncorrectRequest, Response = "Incorrect Request" };
+                    }
+
                     if (td.Related.Contains("user"))
                     {
                         thread.User = cnn.ReadUser(thread.User as string);

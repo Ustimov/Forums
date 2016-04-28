@@ -110,7 +110,7 @@ namespace Forum.Helpers
 
         public static void UpdateThread(this IDbConnection cnn, UpdateThread ut)
         {
-            cnn.Execute(@"UPDATE Thread SET Message=@Message, Slug=@Slug WHERE Id=@Id", ut);
+            cnn.Execute(@"UPDATE Thread SET Message=@Message, Slug=@Slug WHERE Id=@Thread", ut);
         }
 
         public static void Unsubscribe(this IDbConnection cnn, Unsubscribe u)
