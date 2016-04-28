@@ -52,7 +52,7 @@ namespace Forum.Services
         {
             try
             {
-                var thread = ThreadCrud.Read(request.Thread);
+                var thread = ConnectionProvider.DbConnection.ReadThread(request.Thread);
 
                 if (thread == null)
                 {
@@ -135,7 +135,7 @@ namespace Forum.Services
             }
         }
 
-        private void AddPosts(List<PostModel<int, string, string, int?>> posts, int postId, DateTime? since, int thread,
+        private void AddPosts(List<PostModel<object, object, object, object>> posts, int postId, DateTime? since, int thread,
             string order, int? limit)
         {
             if (limit != null && limit == posts.Count)
@@ -171,11 +171,11 @@ namespace Forum.Services
         {
             try
             {
-                List<PostModel<int, string, string, int?>> posts = new List<PostModel<int, string, string, int?>>();
+                List<PostModel<object, object, object, object>> posts = new List<PostModel<object, object, object, object>>();
 
                 if (request.Sort == "flat")
                 {
-                    posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since,
+                    posts = ConnectionProvider.DbConnection.ReadAllPosts(request.Forum, request.Thread, request.Since,
                         request.Order, request.Limit, true);
                 }
                 else if (request.Sort == "tree")
@@ -211,7 +211,7 @@ namespace Forum.Services
                     }
                 }
 
-                return new BaseResponse<List<PostModel<int, string, string, int?>>>
+                return new BaseResponse<List<PostModel<object, object, object, object>>>
                 {
                     Code = StatusCode.Ok,
                     Response = posts,
@@ -325,7 +325,7 @@ namespace Forum.Services
                 return new BaseResponse<ThreadModel<string, string>>
                 {
                     Code = StatusCode.Ok,
-                    Response = ThreadCrud.Read(request.Thread),
+                    Response = ConnectionProvider.DbConnection.ReadThread(request.Thread),
                 };
             }
             catch (Exception e)
@@ -352,7 +352,7 @@ namespace Forum.Services
                 return new BaseResponse<ThreadModel<string, string>>
                 {
                     Code = StatusCode.Ok,
-                    Response = ThreadCrud.Read(request.Thread),
+                    Response = ConnectionProvider.DbConnection.ReadThread(request.Thread),
                 };
             }
             catch (Exception e)

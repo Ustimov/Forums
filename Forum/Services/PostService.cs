@@ -63,7 +63,7 @@ namespace Forum.Services
 
                 if (request.Related == null)
                 {
-                    return new BaseResponse<PostModel<int, string, string, int?>> { Code = StatusCode.Ok, Response = post };
+                    return new BaseResponse<PostModel<object, object, object, object>> { Code = StatusCode.Ok, Response = post };
                 }
                 else if (request.Related.Count == 3 && request.Related.Contains("user") &&
                     request.Related.Contains("thread") && request.Related.Contains("forum"))
@@ -73,10 +73,11 @@ namespace Forum.Services
                         Code = StatusCode.Ok,
                         Response = new PostModel<ThreadModel<string, string>, ForumModel<object>, UserModel, int?>(post)
                         {
-                            Thread = ThreadCrud.Read(post.Thread),
-                            Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                            User = ConnectionProvider.DbConnection.ReadUser(post.User),
-                            Parent = (post.Parent == 0 ? null : post.Parent),
+                            Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
+                            Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
+                            User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
+                            //TODO: FIX
+                            //Parent = (post.Parent == 0 ? null : post.Parent),
                         },
                     };
                 }
@@ -89,10 +90,10 @@ namespace Forum.Services
                             Code = StatusCode.Ok,
                             Response = new PostModel<ThreadModel<string, string>, string, UserModel, int?>(post)
                             {
-                                Thread = ThreadCrud.Read(post.Thread),
-                                Forum = post.Forum,
-                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
-                                Parent = post.Parent,
+                                Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
+                                Forum = post.Forum as string,
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
+                                Parent = post.Parent as int?,
                             },
                         };
                     }
@@ -104,9 +105,9 @@ namespace Forum.Services
                             Response = new PostModel<int, ForumModel<object>, UserModel, int?>(post)
                             {
                                 Thread = post.Id,
-                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
-                                Parent = post.Parent,
+                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
+                                Parent = post.Parent as int?,
                             },
                         };
                     }
@@ -117,10 +118,10 @@ namespace Forum.Services
                             Code = StatusCode.Ok,
                             Response = new PostModel<ThreadModel<string, string>, ForumModel<object>, string, int?>(post)
                             {
-                                Thread = ThreadCrud.Read(post.Thread),
-                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                                User = post.User,
-                                Parent = post.Parent,
+                                Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
+                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
+                                User = post.User as string,
+                                Parent = post.Parent as int?,
                             },
                         };
                     }
@@ -129,15 +130,15 @@ namespace Forum.Services
                 {
                     if (request.Related.Contains("user"))
                     {
-                        return new BaseResponse<PostModel<int, string, UserModel, int?>>
+                        return new BaseResponse<PostModel<int?, string, UserModel, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, string, UserModel, int?>(post)
+                            Response = new PostModel<int?, string, UserModel, int?>(post)
                             {
-                                Thread = post.Thread,
-                                Forum = post.Forum,
-                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
-                                Parent = post.Parent,
+                                Thread = post.Thread as int?,
+                                Forum = post.Forum as string,
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
+                                Parent = post.Parent as int?,
                             },
                         };
                     }
@@ -148,24 +149,24 @@ namespace Forum.Services
                             Code = StatusCode.Ok,
                             Response = new PostModel<ThreadModel<string, string>, string, string, int?>(post)
                             {
-                                Thread = ThreadCrud.Read(post.Thread),
-                                Forum = post.Forum,
-                                User = post.User,
-                                Parent = post.Parent,
+                                Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
+                                Forum = post.Forum as string,
+                                User = post.User as string,
+                                Parent = post.Parent as int?,
                             },
                         };
                     }
                     else if (request.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<int, ForumModel<object>, string, int?>>
+                        return new BaseResponse<PostModel<int?, ForumModel<object>, string, int?>>
                         {
                             Code = StatusCode.Ok,
-                            Response = new PostModel<int, ForumModel<object>, string, int?>(post)
+                            Response = new PostModel<int?, ForumModel<object>, string, int?>(post)
                             {
-                                Thread = post.Thread,
-                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                                User = post.User,
-                                Parent = post.Parent,
+                                Thread = post.Thread as int?,
+                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
+                                User = post.User as string,
+                                Parent = post.Parent as int?,
                             },
                         };
                     }
@@ -183,9 +184,9 @@ namespace Forum.Services
         {
             try
             {
-                var posts = PostCrud.ReadAll(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
+                var posts = ConnectionProvider.DbConnection.ReadAllPosts(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
 
-                return new BaseResponse<List<PostModel<int, string, string, int?>>>
+                return new BaseResponse<List<PostModel<object, object, object, object>>>
                 {
                     Code = StatusCode.Ok,
                     Response = posts
@@ -245,7 +246,7 @@ namespace Forum.Services
                     @"update Post set Message=@Message where Id=@Id",
                     new { Message = request.Message, Id = request.Post });
 
-                return new BaseResponse<PostModel<int, string, string, int?>>
+                return new BaseResponse<PostModel<object, object, object, object>>
                 {
                     Code = StatusCode.Ok,
                     Response = PostCrud.Read(request.Post),
@@ -271,7 +272,7 @@ namespace Forum.Services
                     @"update Post set Dislikes=Dislikes+1 where Id=@Id", new { Id = request.Post });
             }
 
-            return new BaseResponse<PostModel<int, string, string, int?>>
+            return new BaseResponse<PostModel<object, object, object, object>>
             {
                 Code = StatusCode.Ok,
                 Response = PostCrud.Read(request.Post),

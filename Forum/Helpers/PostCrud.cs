@@ -5,6 +5,7 @@ using System.Web;
 using Dapper;
 using Forum.Dtos.Post;
 using Forum.Models;
+using System.Data;
 
 namespace Forum.Helpers
 {
@@ -56,13 +57,13 @@ namespace Forum.Helpers
                 }).FirstOrDefault();
         }
 
-        public static PostModel<int, string, string, int?> Read(int id)
+        public static PostModel<object, object, object, object> Read(int id)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
+            return ConnectionProvider.DbConnection.Query<PostModel<object, object, object, object>>(
                 @"select * from Post where Id=@Id", new { Id = id }).FirstOrDefault();
         }
 
-        public static List<PostModel<int, string, string, int?>> ReadAll(string forum, int? thread, DateTime? since,
+        public static List<PostModel<object, object, object, object>> ReadAllPosts(this IDbConnection cnn, string forum, int? thread, DateTime? since,
             string order, int? limit, bool isDeleted=false)
         {
             var sql = "select * from Post where " + (isDeleted == false ? "IsDeleted=false and " : string.Empty) +
@@ -71,7 +72,7 @@ namespace Forum.Helpers
                 (order == null ? string.Empty : " order by Date " + order) +
                 (limit == null ? string.Empty : " limit @Limit");
 
-            var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
+            var posts = cnn.Query<PostModel<object, object, object, object>>(
                 sql,
                 new
                 {

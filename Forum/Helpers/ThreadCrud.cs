@@ -29,9 +29,9 @@ namespace Forum.Helpers
                 });
         }
 
-        public static ThreadModel<string, string> Read(int id)
+        public static ThreadModel<string, string> ReadThread(this IDbConnection cnn, int? id)
         {
-            var thread = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+            var thread = cnn.Query<ThreadModel<string, string>>(
                 @"select * from Thread where Id = @Id", new { Id = id }).FirstOrDefault();
 
             if (thread != null)

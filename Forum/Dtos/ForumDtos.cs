@@ -126,4 +126,10 @@ namespace Forum.Dtos.Forum
     {
 
     }
+
+    [DataContract]
+    public class ForumListPostsResponse : BaseResponse<List<PostModel<object, object, object, object>>>
+    {
+
+    }
 }
