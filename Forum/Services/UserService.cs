@@ -21,7 +21,7 @@ namespace Forum.Services
                 return new CreateResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = UserCrud.Read(request.Email),
+                    Response = ConnectionProvider.DbConnection.ReadUser(request.Email),
                 };
             }
             catch (MySqlException e)
@@ -32,7 +32,7 @@ namespace Forum.Services
 
         public object Get(UserDetails request)
         {
-            var user = UserCrud.Read(request.Email);
+            var user = ConnectionProvider.DbConnection.ReadUser(request.Email);
 
             if (user != null)
             {
@@ -52,7 +52,7 @@ namespace Forum.Services
                     @"insert into Follower (Follower, Followee) values(@Follower, @Followee)",
                     new { Follower = request.Follower, Followee = request.Followee });
 
-                return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = UserCrud.Read(request.Follower) };
+                return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = ConnectionProvider.DbConnection.ReadUser(request.Follower) };
             }
             catch (Exception e)
             {
@@ -130,7 +130,7 @@ namespace Forum.Services
                     @"delete from Follower where Follower=@Follower and Followee=@Followee",
                     new { Follower = request.Follower, Followee = request.Followee });
 
-                return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = UserCrud.Read(request.Follower) };
+                return new BaseResponse<UserModel> { Code = StatusCode.Ok, Response = ConnectionProvider.DbConnection.ReadUser(request.Follower) };
             }
             catch (Exception e)
             {
@@ -144,7 +144,7 @@ namespace Forum.Services
             {
                 UserCrud.Update(request);
 
-                return new UpdateProfileResponse { Code = StatusCode.Ok, Response = UserCrud.Read(request.Email) };
+                return new UpdateProfileResponse { Code = StatusCode.Ok, Response = ConnectionProvider.DbConnection.ReadUser(request.Email) };
             }
             catch(MySqlException e)
             {

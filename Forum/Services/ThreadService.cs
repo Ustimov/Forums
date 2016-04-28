@@ -75,7 +75,7 @@ namespace Forum.Services
                         Response = new ThreadModel<ForumModel<object>, UserModel>(thread)
                         {
                             Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
-                            User = UserCrud.Read(thread.User),
+                            User = ConnectionProvider.DbConnection.ReadUser(thread.User),
                         },
                     };
                 }
@@ -101,7 +101,7 @@ namespace Forum.Services
                             Response = new ThreadModel<string, UserModel>(thread)
                             {
                                 Forum = thread.Forum,
-                                User = UserCrud.Read(thread.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(thread.User),
                             },
                         };
                     }
@@ -123,10 +123,10 @@ namespace Forum.Services
         {
             try
             {   
-                return new BaseResponse<List<ThreadModel<string, string>>>
+                return new BaseResponse<List<ThreadModel<object, object>>>
                 {
                     Code = StatusCode.Ok,
-                    Response = ThreadCrud.ReadAll(request.Forum, request.User, request.Since, request.Order, request.Limit),
+                    Response = ConnectionProvider.DbConnection.ReadAllThreads(request.Forum, request.User, request.Since, request.Order, request.Limit),
                 };
             }
             catch (Exception e)

@@ -39,7 +39,7 @@ namespace Forum.Services
                 }
                 else if (fd.Related != null && fd.Related.Contains("user"))
                 {
-                    forum.User = UserCrud.Read(forum.User as string);
+                    forum.User = cnn.ReadUser(forum.User as string);
                 }
 
                 return new ForumDetailsResponse { Code = StatusCode.Ok, Response = forum };
@@ -77,7 +77,7 @@ namespace Forum.Services
                         {
                             Thread = ThreadCrud.Read(post.Thread),
                             Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                            User = UserCrud.Read(post.User),
+                            User = ConnectionProvider.DbConnection.ReadUser(post.User),
                             Parent = post.Parent,
                         });
                     }
@@ -125,7 +125,7 @@ namespace Forum.Services
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
-                                User = UserCrud.Read(post.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
                                 Parent = post.Parent,
                             });
                         }
@@ -147,7 +147,7 @@ namespace Forum.Services
                             {
                                 Thread = post.Thread,
                                 Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                                User = UserCrud.Read(post.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
                                 Parent = post.Parent,
                             });
                         }
@@ -171,7 +171,7 @@ namespace Forum.Services
                             {
                                 Thread = post.Thread,
                                 Forum = post.Forum,
-                                User = UserCrud.Read(post.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
                                 Parent = post.Parent,
                             });
                         }
@@ -234,81 +234,37 @@ namespace Forum.Services
             }
         }
 
-        public object Get(ForumListThreads request)
+        public object Get(ForumListThreads flt)
         {
             try
             {
-                var threads = ThreadCrud.ReadAll(request.Forum, null, request.Since, request.Order, request.Limit);
+                var cnn = ConnectionProvider.DbConnection;
+                var threads = cnn.ReadAllThreads(flt.Forum, null, flt.Since, flt.Order, flt.Limit);
 
-                if (request.Related == null)
+                if (flt.Related != null)
                 {
-                    return new BaseResponse<List<ThreadModel<string, string>>> { Code = StatusCode.Ok, Response = threads };
-                }
-                else if (request.Related.Count == 2 && request.Related.Contains("user") && request.Related.Contains("forum"))
-                {
-                    var threadWithUserAndForum = new List<ThreadModel<ForumModel<object>, UserModel>>();
-                    foreach (var thread in threads)
+                    if (flt.Related.Contains("user"))
                     {
-                        threadWithUserAndForum.Add(new ThreadModel<ForumModel<object>, UserModel>(thread)
-                        {
-                            User = UserCrud.Read(thread.User),
-                            Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
-                        });
-                    }
-
-                    return new BaseResponse<List<ThreadModel<ForumModel<object>, UserModel>>>
-                    {
-                        Code = StatusCode.Ok,
-                        Response = threadWithUserAndForum,
-                    };
-                }
-                else if (request.Related.Count == 1)
-                {
-                    if (request.Related.Contains("user"))
-                    {
-                        var threadWithUser = new List<ThreadModel<string, UserModel>>();
-                        
                         foreach (var thread in threads)
                         {
-                            threadWithUser.Add(new ThreadModel<string, UserModel>(thread)
-                            {
-                                User = UserCrud.Read(thread.User),
-                                Forum = thread.Forum,
-                            });
+                            thread.User = cnn.ReadUser(thread.User as string);
                         }
-
-                        return new BaseResponse<List<ThreadModel<string, UserModel>>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = threadWithUser,
-                        };
                     }
-                    else if (request.Related.Contains("forum"))
-                    {
-                        var threadWithForum = new List<ThreadModel<ForumModel<object>, string>>();
 
+                    if (flt.Related.Contains("forum"))
+                    {
                         foreach (var thread in threads)
                         {
-                            threadWithForum.Add(new ThreadModel<ForumModel<object>, string>(thread)
-                            {
-                                User = thread.User,
-                                Forum = ConnectionProvider.DbConnection.ReadForum(thread.Forum),
-                            });
+                            thread.Forum = cnn.ReadForum(thread.Forum as string);
                         }
-
-                        return new BaseResponse<List<ThreadModel<ForumModel<object>, string>>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = threadWithForum,
-                        };
                     }
                 }
 
-                return new BaseResponse<string> { Code = StatusCode.UndefinedError, Response = "Undefined error" };
+                return new ForumListThreadsResponse { Code = StatusCode.Ok, Response = threads };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
@@ -316,11 +272,15 @@ namespace Forum.Services
         {
             try
             {
-                return new BaseResponse<List<UserModel>> { Code = StatusCode.Ok, Response = UserCrud.ReadAll(request) };
+                return new ForumListUsersResponse
+                {
+                    Code = StatusCode.Ok,
+                    Response = ConnectionProvider.DbConnection.ReadAllUsers(request),
+                };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
     }

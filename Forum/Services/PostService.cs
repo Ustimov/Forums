@@ -75,7 +75,7 @@ namespace Forum.Services
                         {
                             Thread = ThreadCrud.Read(post.Thread),
                             Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                            User = UserCrud.Read(post.User),
+                            User = ConnectionProvider.DbConnection.ReadUser(post.User),
                             Parent = (post.Parent == 0 ? null : post.Parent),
                         },
                     };
@@ -91,7 +91,7 @@ namespace Forum.Services
                             {
                                 Thread = ThreadCrud.Read(post.Thread),
                                 Forum = post.Forum,
-                                User = UserCrud.Read(post.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
                                 Parent = post.Parent,
                             },
                         };
@@ -105,7 +105,7 @@ namespace Forum.Services
                             {
                                 Thread = post.Id,
                                 Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum),
-                                User = UserCrud.Read(post.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
                                 Parent = post.Parent,
                             },
                         };
@@ -136,7 +136,7 @@ namespace Forum.Services
                             {
                                 Thread = post.Thread,
                                 Forum = post.Forum,
-                                User = UserCrud.Read(post.User),
+                                User = ConnectionProvider.DbConnection.ReadUser(post.User),
                                 Parent = post.Parent,
                             },
                         };

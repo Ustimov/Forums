@@ -7,6 +7,7 @@ using Dapper;
 using Forum.Dtos.User;
 using Forum.Dtos.Forum;
 using Forum.Dtos.Base;
+using System.Data;
 
 namespace Forum.Helpers
 {
@@ -27,12 +28,11 @@ namespace Forum.Helpers
                 });
         }
 
-        public static UserModel Read(string email)
+        public static UserModel ReadUser(this IDbConnection cnn, string email)
         {
-            var user = ConnectionProvider.DbConnection.Query<UserModel>(
+            var user = cnn.Query<UserModel>(
                 @"select * from User where Email = @Email",
-                new { Email = email })
-                .FirstOrDefault();
+                new { Email = email }).FirstOrDefault();
             
             if (user == null)
             {
@@ -117,9 +117,9 @@ namespace Forum.Helpers
                 ToList();
         }
 
-        public static List<UserModel> ReadAll(ForumListUsers request)
+        public static List<UserModel> ReadAllUsers(this IDbConnection cnn, ForumListUsers request)
         {
-            var users = ConnectionProvider.DbConnection.Query<UserModel>(
+            var users = cnn.Query<UserModel>(
                 @"select distinct u.* from Post p left join User u on p.User = u.Email where p.Forum=@Forum" +
                 (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId") +
                 (request.Order == null ? string.Empty : " order by u.Name " + request.Order) +

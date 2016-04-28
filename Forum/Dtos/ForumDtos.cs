@@ -114,4 +114,16 @@ namespace Forum.Dtos.Forum
     {
 
     }
+
+    [DataContract]
+    public class ForumListUsersResponse : BaseResponse<List<UserModel>>
+    {
+
+    }
+
+    [DataContract]
+    public class ForumListThreadsResponse : BaseResponse<List<ThreadModel<object, object>>>
+    {
+
+    }
 }

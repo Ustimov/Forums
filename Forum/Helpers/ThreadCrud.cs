@@ -5,10 +5,11 @@ using System.Linq;
 using System.Web;
 using Dapper;
 using Forum.Models;
+using System.Data;
 
 namespace Forum.Helpers
 {
-    public class ThreadCrud
+    public static class ThreadCrud
     {
         public static void Create(CreateThread request)
         {
@@ -72,10 +73,10 @@ namespace Forum.Helpers
             return thread;
         }
 
-        public static List<ThreadModel<string, string>> ReadAll(string forum, string user, DateTime? since,
+        public static List<ThreadModel<object, object>> ReadAllThreads(this IDbConnection cnn, string forum, string user, DateTime? since,
             string order, int? limit)
         {
-            var threads = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
+            var threads = cnn.Query<ThreadModel<object, object>>(
                 @"select * from Thread where IsDeleted=false and " +
                 (user == null ? "Forum=@Forum" : "User=@User") +
                 (since == null ? string.Empty : " and Date >= @Since") +
