@@ -1,27 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ServiceStack.ServiceInterface;
 using Forum.Dtos.Post;
 using Forum.Dtos.Base;
-using Forum.Models;
 using Forum.Helpers;
-using Dapper;
 
 namespace Forum.Services
 {
     public class PostService : Service
     {
-        public object Post(CreatePost request)
+        public object Post(CreatePost cp)
         {
             try
             {
-                PostCrud.Create(request);
+                var cnn = ConnectionProvider.DbConnection;
+                cnn.CreatePost(cp);
+                cp.Id = cnn.LastInsertId();
 
-                var post = PostCrud.Read(request);
-
+                /*
                 var parentPath = String.Empty;
 
                 if (request.Parent != null)
@@ -37,156 +32,66 @@ namespace Forum.Services
                         Post = post.Id,
                         Path = (parentPath == String.Empty ? String.Empty : parentPath + ".") + post.Id.ToString("D10"),
                     });
+                */
 
-                return new BaseResponse<PostModel<int, string, string, int?>>
+                return new CreatePostResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = post,
+                    Response = cp,
                 };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Get(PostDetails request)
+        public object Get(PostDetails pd)
         {
             try
             {
-                var post = PostCrud.Read(request.Post);
+                var cnn = ConnectionProvider.DbConnection;
+                var post = cnn.ReadPost(pd.Post);
 
                 if (post == null)
                 {
-                    return new BaseResponse<string> { Code = StatusCode.ObjectNotFound, Response = "Post not found" };
+                    return new ErrorResponse { Code = StatusCode.ObjectNotFound, Response = "Post Not Found" };
                 }
 
-                if (request.Related == null)
+                if (pd.Related != null)
                 {
-                    return new BaseResponse<PostModel<object, object, object, object>> { Code = StatusCode.Ok, Response = post };
-                }
-                else if (request.Related.Count == 3 && request.Related.Contains("user") &&
-                    request.Related.Contains("thread") && request.Related.Contains("forum"))
-                {
-                    return new BaseResponse<PostModel<ThreadModel<object, object>, ForumModel<object>, UserModel, int?>>
+                    if (pd.Related.Contains("user"))
                     {
-                        Code = StatusCode.Ok,
-                        Response = new PostModel<ThreadModel<object, object>, ForumModel<object>, UserModel, int?>(post)
-                        {
-                            Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
-                            Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
-                            User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
-                            //TODO: FIX
-                            //Parent = (post.Parent == 0 ? null : post.Parent),
-                        },
-                    };
-                }
-                else if (request.Related.Count == 2)
-                {
-                    if (request.Related.Contains("user") && request.Related.Contains("thread"))
-                    {
-                        return new BaseResponse<PostModel<ThreadModel<object, object>, string, UserModel, int?>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<object, object>, string, UserModel, int?>(post)
-                            {
-                                Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
-                                Forum = post.Forum as string,
-                                User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
-                                Parent = post.Parent as int?,
-                            },
-                        };
+                        post.User = cnn.ReadUser(post.User as string);
                     }
-                    else if (request.Related.Contains("user") && request.Related.Contains("forum"))
+
+                    if (pd.Related.Contains("thread"))
                     {
-                        return new BaseResponse<PostModel<int, ForumModel<object>, UserModel, int?>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new PostModel<int, ForumModel<object>, UserModel, int?>(post)
-                            {
-                                Thread = post.Id,
-                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
-                                User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
-                                Parent = post.Parent as int?,
-                            },
-                        };
+                        post.Thread = cnn.ReadThread(post.Thread as int?);
                     }
-                    else if (request.Related.Contains("thread") && request.Related.Contains("forum"))
+
+                    if (pd.Related.Contains("forum"))
                     {
-                        return new BaseResponse<PostModel<ThreadModel<object, object>, ForumModel<object>, string, int?>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<object, object>, ForumModel<object>, string, int?>(post)
-                            {
-                                Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
-                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
-                                User = post.User as string,
-                                Parent = post.Parent as int?,
-                            },
-                        };
-                    }
-                }
-                else if (request.Related.Count == 1)
-                {
-                    if (request.Related.Contains("user"))
-                    {
-                        return new BaseResponse<PostModel<int?, string, UserModel, int?>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new PostModel<int?, string, UserModel, int?>(post)
-                            {
-                                Thread = post.Thread as int?,
-                                Forum = post.Forum as string,
-                                User = ConnectionProvider.DbConnection.ReadUser(post.User as string),
-                                Parent = post.Parent as int?,
-                            },
-                        };
-                    }
-                    else if (request.Related.Contains("thread"))
-                    {
-                        return new BaseResponse<PostModel<ThreadModel<object, object>, string, string, int?>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new PostModel<ThreadModel<object, object>, string, string, int?>(post)
-                            {
-                                Thread = ConnectionProvider.DbConnection.ReadThread(post.Thread as int?),
-                                Forum = post.Forum as string,
-                                User = post.User as string,
-                                Parent = post.Parent as int?,
-                            },
-                        };
-                    }
-                    else if (request.Related.Contains("forum"))
-                    {
-                        return new BaseResponse<PostModel<int?, ForumModel<object>, string, int?>>
-                        {
-                            Code = StatusCode.Ok,
-                            Response = new PostModel<int?, ForumModel<object>, string, int?>(post)
-                            {
-                                Thread = post.Thread as int?,
-                                Forum = ConnectionProvider.DbConnection.ReadForum(post.Forum as string),
-                                User = post.User as string,
-                                Parent = post.Parent as int?,
-                            },
-                        };
+                        post.Forum = cnn.ReadForum(post.Forum as string);
                     }
                 }
 
-                return new BaseResponse<string> { Code = StatusCode.IncorrectRequest, Response = "Incorrect request" };
+                return new PostDetailsResponse { Code = StatusCode.Ok, Response = post };
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Get(PostListPosts request)
+        public object Get(PostListPosts plp)
         {
             try
             {
-                var posts = ConnectionProvider.DbConnection.ReadAllPosts(request.Forum, request.Thread, request.Since, request.Order, request.Limit);
+                var posts = ConnectionProvider.DbConnection.ReadAllPosts(
+                    plp.Forum, plp.Thread, plp.Since, plp.Order, plp.Limit);
 
-                return new BaseResponse<List<PostModel<object, object, object, object>>>
+                return new PostListPostsResponse
                 {
                     Code = StatusCode.Ok,
                     Response = posts
@@ -194,90 +99,81 @@ namespace Forum.Services
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Post(RemovePost request)
+        public object Post(RemovePost rp)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set IsDeleted=true where Id=@Id", new { Id = request.Post });
+                ConnectionProvider.DbConnection.RemovePost(rp);
 
-                /*
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Path set IsDeleted=true where Post=@Id", new { Id = request.Post });
-                */
-
-                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Post };
+                return new RemovePostResponse { Code = StatusCode.Ok, Response = rp.Post };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Post(RestorePost request)
+        public object Post(RestorePost rp)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set IsDeleted=false where Id=@Id", new { Id = request.Post });
+                ConnectionProvider.DbConnection.RestorePost(rp);
 
-                /*
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Path set IsDeleted=false where Post=@Id", new { Id = request.Post });
-                */
-
-                return new BaseResponse<int> { Code = StatusCode.Ok, Response = request.Post };
+                return new RestorePostResponse { Code = StatusCode.Ok, Response = rp.Post };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Post(UpdatePost request)
+        public object Post(UpdatePost up)
         {
             try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set Message=@Message where Id=@Id",
-                    new { Message = request.Message, Id = request.Post });
+                var cnn = ConnectionProvider.DbConnection;
 
-                return new BaseResponse<PostModel<object, object, object, object>>
+                return new UpdatePostResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = PostCrud.Read(request.Post),
+                    Response = cnn.ReadPost(up.Post),
                 };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
         }
 
-        public object Post(VotePost request)
+        public object Post(VotePost vp)
         {
-            System.Diagnostics.Debug.WriteLine($"Thread: { request.Post } | Value {request.Value}");
-            if (request.Value == 1)
+            try
             {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set Likes=Likes+1 where Id=@Id", new { Id = request.Post });
-            }
-            else if (request.Value == -1)
-            {
-                ConnectionProvider.DbConnection.Execute(
-                    @"update Post set Dislikes=Dislikes+1 where Id=@Id", new { Id = request.Post });
-            }
+                var cnn = ConnectionProvider.DbConnection;
 
-            return new BaseResponse<PostModel<object, object, object, object>>
+                if (vp.Value == 1)
+                {
+                    cnn.LikePost(vp);
+                }
+                else if (vp.Value == -1)
+                {
+                    cnn.DislikePost(vp);
+                }
+
+                return new VoteThreadResponse
+                {
+                    Code = StatusCode.Ok,
+                    Response = cnn.ReadPost(vp.Post),
+                };
+            }
+            catch (Exception e)
             {
-                Code = StatusCode.Ok,
-                Response = PostCrud.Read(request.Post),
-            };
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
+            }
         }
-
     }
 }

@@ -17,7 +17,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class CreateResponse : BaseResponse<PostModel<int, string, string, int>>
+    public class CreatePostResponse : BaseResponse<PostModel<int, string, string, int?>>
     {
 
     }
@@ -37,7 +37,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class DetailsResponse : BaseResponse<PostModel<int, string, string, int?>>
+    public class PostDetailsResponse : BaseResponse<PostModel<object, object, object, object>>
     {
 
     }
@@ -65,7 +65,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class RemoveResponse : BaseResponse<BasePost>
+    public class RemovePostResponse : BaseResponse<int>
     {
         
     }
@@ -78,7 +78,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class RestoreResponse : BaseResponse<BasePost>
+    public class RestorePostResponse : BaseResponse<int>
     {
 
     }
@@ -93,7 +93,7 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class UpdateResponse : BaseResponse<PostModel<int, string, string, int?>>
+    public class UpdatePostResponse : BaseResponse<PostModel<object, object, object, object>>
     {
 
     }
@@ -108,7 +108,13 @@ namespace Forum.Dtos.Post
     }
 
     [DataContract]
-    public class VoteResponse : BaseResponse<PostModel<int, string, string, int?>>
+    public class VoteThreadResponse : BaseResponse<PostModel<object, object, object, object>>
+    {
+
+    }
+
+    [DataContract]
+    public class PostListPostsResponse : BaseResponse<List<PostModel<object, object, object, object>>>
     {
 
     }

@@ -106,7 +106,7 @@ namespace Forum.Services
                 return;
             }
 
-            var post = PostCrud.Read(postId);
+            var post = ConnectionProvider.DbConnection.ReadPost(postId);
             posts.Add(post);
 
             var path = PostCrud.ReadPath(post.Id);
@@ -155,7 +155,7 @@ namespace Forum.Services
 
                     foreach (var id in ids)
                     {
-                        var post = PostCrud.Read(id);
+                        var post = ConnectionProvider.DbConnection.ReadPost(id);
                         posts.Add(post);
 
                         var childs = PostCrud.ReadChilds(post.Id, null, request.Since,
@@ -163,7 +163,7 @@ namespace Forum.Services
 
                         foreach (var child in childs)
                         {
-                            posts.Add(PostCrud.Read(child));
+                            posts.Add(ConnectionProvider.DbConnection.ReadPost(child));
                         }
                     }
                 }

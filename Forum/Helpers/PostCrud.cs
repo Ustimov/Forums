@@ -11,9 +11,9 @@ namespace Forum.Helpers
 {
     public static class PostCrud
     {
-        public static void Create(CreatePost request)
+        public static void CreatePost(this IDbConnection cnn, CreatePost request)
         {
-            ConnectionProvider.DbConnection.Execute(
+            cnn.Execute(
                 @"insert into Post 
                 (Parent, IsApproved, IsHighlighted, IsEdited, IsSpam, IsDeleted, Date, Thread, Message, User, Forum,
                 Likes, Dislikes)
@@ -57,9 +57,9 @@ namespace Forum.Helpers
                 }).FirstOrDefault();
         }
 
-        public static PostModel<object, object, object, object> Read(int id)
+        public static PostModel<object, object, object, object> ReadPost(this IDbConnection cnn, int id)
         {
-            return ConnectionProvider.DbConnection.Query<PostModel<object, object, object, object>>(
+            return cnn.Query<PostModel<object, object, object, object>>(
                 @"select * from Post where Id=@Id", new { Id = id }).FirstOrDefault();
         }
 
@@ -128,6 +128,31 @@ namespace Forum.Helpers
         {
             return ConnectionProvider.DbConnection.ExecuteScalar<string>(
                 @"select Path from Post where Id=@Post", new { Post = id });
+        }
+
+        public static void LikePost(this IDbConnection cnn, VotePost vp)
+        {
+            cnn.Execute(@"UPDATE Post SET Likes=Likes+1 WHERE Id=@Post", vp);
+        }
+
+        public static void DislikePost(this IDbConnection cnn, VotePost vp)
+        {
+            cnn.Execute(@"UPDATE Post SET Dislikes=Dislikes+1 WHERE Id=@Id", vp);
+        }
+
+        public static void UpdatePost(this IDbConnection cnn, UpdatePost up)
+        {
+            cnn.Execute(@"UPDATE Post SET Message=@Message WHERE Id=@Post", up);
+        }
+
+        public static void RestorePost(this IDbConnection cnn, RestorePost rp)
+        {
+            cnn.Execute(@"UPDATE Post SET IsDeleted=false WHERE Id=@Post", rp);
+        }
+
+        public static void RemovePost(this IDbConnection cnn, RemovePost rp)
+        {
+            cnn.Execute(@"UPDATE Post SET IsDeleted=true WHERE Id=@Post", rp);
         }
 
         public static int Count()
