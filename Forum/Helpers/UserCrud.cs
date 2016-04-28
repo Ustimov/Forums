@@ -8,14 +8,15 @@ using Forum.Dtos.User;
 using Forum.Dtos.Forum;
 using Forum.Dtos.Base;
 using System.Data;
+using System.Data.Common;
 
 namespace Forum.Helpers
 {
     public static class UserCrud
     {
-        public static void Create(UserModel user)
+        public static void CreateUser(this IDbConnection cnn, UserModel user)
         {
-            ConnectionProvider.DbConnection.Execute(
+            cnn.Execute(
                 @"insert into User (About, Email, IsAnonymous, Name, Username)
                 values (@About, @Email, @IsAnonymous, @Name, @Username)",
                 new
@@ -51,14 +52,12 @@ namespace Forum.Helpers
             return user;
         }
 
-        public static void Update(UserModel user)
+        public static void UpdateUser(this IDbConnection cnn, UserModel um)
         { 
-            ConnectionProvider.DbConnection.Execute(
-                @"update User set About=@About, Name=@Name where Email=@Email",
-                new { About = user.About, Name = user.Name, Email = user.Email });
+            cnn.Execute(@"UPDATE User SET About=@About, Name=@Name WHERE Email=@Email", um);
         }
 
-        public static List<UserModel> ReadFollowers(ListFollowers request)
+        public static List<UserModel> ReadFollowers(this IDbConnection cnn, ListFollowers request)
         {
             var users = ConnectionProvider.DbConnection.Query<UserModel>(
                 @"select * from Follower f left join User u on f.Follower=u.Email
@@ -76,9 +75,9 @@ namespace Forum.Helpers
             return users.ToList();
         }
 
-        public static List<UserModel> ReadFollowing(ListFollowing request)
+        public static List<UserModel> ReadFollowing(this DbConnection cnn, ListFollowing request)
         {
-            var users = ConnectionProvider.DbConnection.Query<UserModel>(
+            var users = cnn.Query<UserModel>(
                 @"select * from Follower f left join User u on f.Followee=u.Email
                 where f.Follower=@Email" + (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId")
                 + " order by u.Name " + request.Order,
@@ -143,6 +142,37 @@ namespace Forum.Helpers
             }
 
             return users;
+        }
+
+        public static void Unfollow(this IDbConnection cnn, Unfollow u)
+        {
+            cnn.Execute(@"DELETE FROM Follower WHERE Follower=@Follower AND Followee=@Followee", u);
+        }
+
+        public static IEnumerable<PostModel<int, string, string, int?>> UserListPosts(this IDbConnection cnn, UserListPosts request)
+        {
+            var sql = "select * from Post where User=@User" +
+                (request.Since == null ? string.Empty : " and Date >= @Since") +
+                (request.Order == null ? string.Empty : " order by Date " + request.Order) +
+                (request.Limit == null ? string.Empty : " limit @Limit");
+
+            var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
+                sql,
+                new
+                {
+                    User = request.User,
+                    Since = request.Since,
+                    Limit = request.Limit,
+                });
+            
+            return posts;
+        }
+
+        public static void Follow(this IDbConnection cnn, Follow request)
+        {
+            cnn.Execute(
+                @"insert into Follower (Follower, Followee) values(@Follower, @Followee)",
+                new { Follower = request.Follower, Followee = request.Followee });
         }
 
         public static int Count()

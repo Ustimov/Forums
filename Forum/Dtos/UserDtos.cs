@@ -16,7 +16,7 @@ namespace Forum.Dtos.User
     }
 
     [DataContract]
-    public class CreateResponse : BaseResponse<UserModel>
+    public class CreateUserResponse : BaseResponse<UserModel>
     {
 
     }
@@ -29,7 +29,7 @@ namespace Forum.Dtos.User
     }
 
     [DataContract]
-    public class DetailsResponse : BaseResponse<UserModel>
+    public class UserDetailsResponse : BaseResponse<UserModel>
     {
 
     }
@@ -112,6 +112,12 @@ namespace Forum.Dtos.User
 
     [DataContract]
     public class UpdateProfileResponse : BaseResponse<UserModel>
+    {
+
+    }
+
+    [DataContract]
+    public class UserListPostsResponse : BaseResponse<IEnumerable<PostModel<int, string, string, int?>>>
     {
 
     }
