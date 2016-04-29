@@ -1,10 +1,10 @@
-﻿using Dapper;
+﻿using System;
+using Dapper;
 using ServiceStack.ServiceInterface;
 using Forum.Models;
 using Forum.Dtos.Common;
 using Forum.Extensions;
 using Forum.Dtos.Base;
-using System;
 
 namespace Forum.Services
 {
@@ -12,14 +12,24 @@ namespace Forum.Services
     {
         public object Post(Clear request)
         {
-            ConnectionProvider.DbConnection.Execute("delete from Subscribe");
-            ConnectionProvider.DbConnection.Execute("delete from Post");
-            ConnectionProvider.DbConnection.Execute("delete from Thread");
-            ConnectionProvider.DbConnection.Execute("delete from Forum");
-            ConnectionProvider.DbConnection.Execute("delete from Follower");
-            ConnectionProvider.DbConnection.Execute("delete from User");
+            try
+            {
+                ConnectionProvider.DbConnection.Execute(
+                    @"SET FOREIGN_KEY_CHECKS = 0;
+                    TRUNCATE Subscribe;
+                    TRUNCATE Post;
+                    TRUNCATE Thread;
+                    TRUNCATE Forum;
+                    TRUNCATE Follower;
+                    TRUNCATE User;
+                    SET FOREIGN_KEY_CHECKS = 1;");
 
-            return new ClearResponse { Code = StatusCode.Ok, Response = "Ok" };
+                return new ClearResponse { Code = StatusCode.Ok, Response = "Ok" };
+            }
+            catch (Exception e)
+            {
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
+            }
         }
 
         public object Get(Status s)
@@ -46,4 +56,4 @@ namespace Forum.Services
             }
         }
     }
-} 
+}
