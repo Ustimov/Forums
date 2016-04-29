@@ -2,12 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Dapper;
 using Forum.Models;
 using System.Data;
 
-namespace Forum.Helpers
+namespace Forum.Extensions
 {
     public static class ThreadExtensions
     {

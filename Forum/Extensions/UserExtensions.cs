@@ -1,16 +1,13 @@
-﻿using Forum.Models;
-using System;
+﻿using System.Data;
+using System.Data.Common;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Dapper;
+using Forum.Models;
 using Forum.Dtos.User;
 using Forum.Dtos.Forum;
-using Forum.Dtos.Base;
-using System.Data;
-using System.Data.Common;
 
-namespace Forum.Helpers
+namespace Forum.Extensions
 {
     public static class UserExtensions
     {

@@ -1,7 +1,7 @@
-﻿using Dapper;
-using System.Data;
+﻿using System.Data;
+using Dapper;
 
-namespace Forum.Helpers
+namespace Forum.Extensions
 {
     public static class CommonExtensions
     {

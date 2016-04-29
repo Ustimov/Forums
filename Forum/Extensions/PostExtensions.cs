@@ -6,7 +6,7 @@ using Dapper;
 using Forum.Dtos.Post;
 using Forum.Models;
 
-namespace Forum.Helpers
+namespace Forum.Extensions
 {
     public static class PostExtensions
     {
@@ -18,36 +18,16 @@ namespace Forum.Helpers
                 @Date, @Thread, @Message, @User, @Forum, @Likes, @Dislikes)", cp);
         }
 
-        public static PostModel<int, string, string, int?> Read(CreatePost request)
-        {
-            return ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
-                @"select * from Post where 
-                IsApproved=@IsApproved and IsHighlighted=@IsHighlighted and IsEdited=@IsEdited
-                and IsSpam=@IsSpam and IsDeleted=@IsDeleted and Date=@Date and Thread=@Thread and Message=@Message
-                and User=@User and Forum=@Forum",
-                new
-                {
-                    IsApproved = request.IsApproved,
-                    IsHighlighted = request.IsHighlighted,
-                    IsEdited = request.IsEdited,
-                    IsSpam = request.IsSpam,
-                    IsDeleted = request.IsDeleted,
-                    Date = request.Date,
-                    Thread = request.Thread,
-                    Message = request.Message,
-                    User = request.User,
-                    Forum = request.Forum,
-                }).FirstOrDefault();
-        }
-
         public static PostModel<object, object, object, object> ReadPost(this IDbConnection cnn, int id)
         {
             return cnn.Query<PostModel<object, object, object, object>>(
-                @"select * from Post where Id=@Id", new { Id = id }).FirstOrDefault();
+                @"SELECT Id, Parent, IsApproved, IsHighlighted, IsEdited, IsSpam, IsDeleted,
+                Date, Thread, Message, User, Forum, Likes, Dislikes FROM Post WHERE Id=@Id",
+                new { Id = id }).FirstOrDefault();
         }
 
-        public static List<PostModel<object, object, object, object>> ReadAllPosts(this IDbConnection cnn, string forum, int? thread, DateTime? since,
-            string order, int? limit, bool isDeleted=false)
+        public static List<PostModel<object, object, object, object>> ReadAllPosts(this IDbConnection cnn,
+            string forum, int? thread, DateTime? since, string order, int? limit, bool isDeleted=false)
         {
             var sql = "select * from Post where " + (isDeleted == false ? "IsDeleted=false and " : string.Empty) +
                 (thread == null ? "Forum=@Forum" : "Thread=@Thread") +
@@ -107,45 +87,39 @@ namespace Forum.Helpers
                 new { Limit = limit, Since = since, Thread = thread }).AsList();
         }
 
-        public static string ReadPath(int id)
-        {
-            return ConnectionProvider.DbConnection.ExecuteScalar<string>(
-                @"select Path from Post where Id=@Post", new { Post = id });
-        }
-
         public static void LikePost(this IDbConnection cnn, VotePost vp)
         {
-            cnn.Execute(@"UPDATE Post SET Likes=Likes+1 WHERE Id=@Post", vp);
+            cnn.Execute(@"UPDATE Post SET Likes=Likes+1 WHERE Id=@Post AND IsDeleted=false", vp);
         }
 
         public static void DislikePost(this IDbConnection cnn, VotePost vp)
         {
-            cnn.Execute(@"UPDATE Post SET Dislikes=Dislikes+1 WHERE Id=@Post", vp);
+            cnn.Execute(@"UPDATE Post SET Dislikes=Dislikes+1 WHERE Id=@Post AND IsDeleted=false", vp);
         }
 
         public static void UpdatePost(this IDbConnection cnn, UpdatePost up)
         {
-            cnn.Execute(@"UPDATE Post SET Message=@Message WHERE Id=@Post", up);
+            cnn.Execute(@"UPDATE Post SET Message=@Message WHERE Id=@Post AND IsDeleted=false", up);
         }
 
         public static void RestorePost(this IDbConnection cnn, RestorePost rp)
         {
-            cnn.Execute(@"UPDATE Post SET IsDeleted=false WHERE Id=@Post", rp);
+            cnn.Execute(@"UPDATE Post SET IsDeleted=false WHERE Id=@Post AND IsDeleted=true", rp);
         }
 
         public static void RemovePost(this IDbConnection cnn, RemovePost rp)
         {
-            cnn.Execute(@"UPDATE Post SET IsDeleted=true WHERE Id=@Post", rp);
+            cnn.Execute(@"UPDATE Post SET IsDeleted=true WHERE Id=@Post AND IsDeleted=false", rp);
         }
 
-        public static string ReadPath(this IDbConnection cnn, CreatePost cp)
+        public static string ReadPath(this IDbConnection cnn, int? id)
         {
-            return cnn.ExecuteScalar<string>(@"SELECT Path FROM Post WHERE Id=@Parent", cp);
+            return cnn.ExecuteScalar<string>(@"SELECT Path FROM Post WHERE Id=@Id AND IsDeleted=false", new { Id = id });
         }
 
         public static void UpdatePath(this IDbConnection cnn, int id, string parentPath)
         {
-            cnn.Execute(@"UPDATE Post SET Path=@Path WHERE Id=@Id",
+            cnn.Execute(@"UPDATE Post SET Path=@Path WHERE Id=@Id AND IsDeleted=false",
                 new
                 {
                     Id = id,

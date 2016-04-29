@@ -4,7 +4,7 @@ using ServiceStack.ServiceInterface;
 using Forum.Dtos.Base;
 using Forum.Dtos.User;
 using Forum.Models;
-using Forum.Helpers;
+using Forum.Extensions;
 using MySql.Data.MySqlClient;
 
 namespace Forum.Services

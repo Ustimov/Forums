@@ -1,7 +1,7 @@
 ﻿using System;
 using ServiceStack.ServiceInterface;
 using Forum.Dtos.Forum;
-using Forum.Helpers;
+using Forum.Extensions;
 using Forum.Dtos.Base;
 
 namespace Forum.Services

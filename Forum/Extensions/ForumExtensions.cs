@@ -4,7 +4,7 @@ using Dapper;
 using Forum.Models;
 using Forum.Dtos.Forum;
 
-namespace Forum.Helpers
+namespace Forum.Extensions
 {
     public static class ForumExtensions
     {

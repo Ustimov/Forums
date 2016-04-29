@@ -118,11 +118,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\CommonExtensions.cs" />
-    <Compile Include="Helpers\ForumExtensions.cs" />
-    <Compile Include="Helpers\PostExtensions.cs" />
-    <Compile Include="Helpers\ThreadExtensions.cs" />
-    <Compile Include="Helpers\UserExtensions.cs" />
+    <Compile Include="Extensions\CommonExtensions.cs" />
+    <Compile Include="Extensions\ForumExtensions.cs" />
+    <Compile Include="Extensions\PostExtensions.cs" />
+    <Compile Include="Extensions\ThreadExtensions.cs" />
+    <Compile Include="Extensions\UserExtensions.cs" />
     <Compile Include="Dtos\BaseDtos.cs" />
     <Compile Include="Dtos\CommonDtos.cs" />
     <Compile Include="Dtos\ForumDtos.cs" />

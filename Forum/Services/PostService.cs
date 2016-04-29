@@ -2,7 +2,7 @@
 using ServiceStack.ServiceInterface;
 using Forum.Dtos.Post;
 using Forum.Dtos.Base;
-using Forum.Helpers;
+using Forum.Extensions;
 
 namespace Forum.Services
 {
@@ -20,7 +20,7 @@ namespace Forum.Services
 
                 if (cp.Parent != null)
                 {
-                    parentPath = cnn.ReadPath(cp);
+                    parentPath = cnn.ReadPath(cp.Parent);
                 }
 
                 cnn.UpdatePath(cp.Id, parentPath);
@@ -127,6 +127,7 @@ namespace Forum.Services
             try
             {
                 var cnn = ConnectionProvider.DbConnection;
+                cnn.UpdatePost(up);
 
                 return new UpdatePostResponse
                 {

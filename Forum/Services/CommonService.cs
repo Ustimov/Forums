@@ -2,7 +2,7 @@
 using ServiceStack.ServiceInterface;
 using Forum.Models;
 using Forum.Dtos.Common;
-using Forum.Helpers;
+using Forum.Extensions;
 using Forum.Dtos.Base;
 using System;
 

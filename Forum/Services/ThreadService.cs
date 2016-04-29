@@ -4,7 +4,7 @@ using ServiceStack.ServiceInterface;
 using Forum.Dtos.Base;
 using Forum.Dtos.Thread;
 using Forum.Models;
-using Forum.Helpers;
+using Forum.Extensions;
 
 namespace Forum.Services
 {
@@ -114,7 +114,7 @@ namespace Forum.Services
             var post = ConnectionProvider.DbConnection.ReadPost(postId);
             posts.Add(post);
 
-            var path = PostExtensions.ReadPath(post.Id);
+            var path = ConnectionProvider.DbConnection.ReadPath(post.Id);
 
             var childs = PostExtensions.ReadChilds(path, null, since, thread, order);
 
