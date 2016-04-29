@@ -1,31 +1,20 @@
-﻿using Forum.Dtos.Thread;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Dapper;
 using Forum.Models;
-using System.Data;
+using Forum.Dtos.Thread;
 
 namespace Forum.Extensions
 {
     public static class ThreadExtensions
     {
-        public static void CreateThread(this IDbConnection cnn, CreateThread request)
+        public static void CreateThread(this IDbConnection cnn, CreateThread ct)
         {
             cnn.Execute(
-                @"insert into Thread (Forum, Title, IsClosed, User, Date, Message, Slug, IsDeleted, Likes, Dislikes)
-                values (@Forum, @Title, @IsClosed, @User, @Date, @Message, @Slug, @IsDeleted, 0, 0)",
-                new
-                {
-                    Forum = request.Forum,
-                    Title = request.Title,
-                    IsClosed = request.IsClosed,
-                    User = request.User,
-                    Date = request.Date,
-                    Message = request.Message,
-                    Slug = request.Slug,
-                    IsDeleted = request.IsDeleted,
-                });
+                @"INSERT INTO Thread (Forum, Title, IsClosed, User, Date, Message, Slug, IsDeleted, Likes, Dislikes)
+                VALUES (@Forum, @Title, @IsClosed, @User, @Date, @Message, @Slug, @IsDeleted, @Likes, @Dislikes)", ct);
         }
 
         public static ThreadModel<object, object> ReadThread(this IDbConnection cnn, int? id)
@@ -36,45 +25,20 @@ namespace Forum.Extensions
 
             if (thread != null)
             {
-                thread.Posts = CountPosts(thread.Id);
+                thread.Posts = cnn.CountThreadPosts(thread.Id);
             }
 
             return thread;
         }
 
-        private static int CountPosts(int id)
+        private static int CountThreadPosts(this IDbConnection cnn, int thread)
         {
-            return ConnectionProvider.DbConnection.ExecuteScalar<int>(
-                @"select count(*) from Post where Thread=@Id and IsDeleted=false", new { Id = id });
+            return cnn.ExecuteScalar<int>(
+                @"SELECT COUNT(*) FROM Post WHERE Thread=@Id AND IsDeleted=false", new { Id = thread });
         }
 
-        public static ThreadModel<string, string> Read(CreateThread request)
-        {
-            var thread = ConnectionProvider.DbConnection.Query<ThreadModel<string, string>>(
-                @"select * from Thread where Forum = @Forum and Title = @Title and IsClosed = @IsClosed and
-                User = @User and Date = @Date and Message = @Message and Slug = @Slug and IsDeleted = @IsDeleted",
-                new
-                {
-                    Forum = request.Forum,
-                    Title = request.Title,
-                    IsClosed = request.IsClosed,
-                    User = request.User,
-                    Date = request.Date,
-                    Message = request.Message,
-                    Slug = request.Slug,
-                    IsDeleted = request.IsDeleted,
-                }).FirstOrDefault();
-
-            if (thread != null)
-            {
-                thread.Posts = CountPosts(thread.Id);
-            }
-
-            return thread;
-        }
-
-        public static List<ThreadModel<object, object>> ReadAllThreads(this IDbConnection cnn, string forum, string user, DateTime? since,
-            string order, int? limit)
+        public static List<ThreadModel<object, object>> ReadAllThreads(this IDbConnection cnn,
+            string forum, string user, DateTime? since, string order, int? limit)
         {
             var threads = cnn.Query<ThreadModel<object, object>>(
                 @"select * from Thread where IsDeleted=false and " +
@@ -92,7 +56,7 @@ namespace Forum.Extensions
 
             foreach (var thread in threads)
             {
-                thread.Posts = CountPosts(thread.Id);
+                thread.Posts = cnn.CountThreadPosts(thread.Id);
             }
 
             return threads;
@@ -100,17 +64,19 @@ namespace Forum.Extensions
 
         public static void LikeThread(this IDbConnection cnn, VoteThread vt)
         {
-            cnn.Execute(@"UPDATE Thread SET Likes=Likes+1 WHERE Id=@Thread", vt);
+            cnn.Execute(@"UPDATE Thread SET Likes=Likes+1 WHERE Id=@Thread AND IsDeleted=false AND IsClosed=false", vt);
         }
 
         public static void DislikeThread(this IDbConnection cnn, VoteThread vt)
         {
-            cnn.Execute(@"UPDATE Thread SET Dislikes=Dislikes+1 WHERE Id=@Thread", vt);
+            cnn.Execute(@"UPDATE Thread SET Dislikes=Dislikes+1
+                WHERE Id=@Thread AND IsDeleted=false AND IsClosed=false", vt);
         }
 
         public static void UpdateThread(this IDbConnection cnn, UpdateThread ut)
         {
-            cnn.Execute(@"UPDATE Thread SET Message=@Message, Slug=@Slug WHERE Id=@Thread", ut);
+            cnn.Execute(@"UPDATE Thread SET Message=@Message, Slug=@Slug
+                WHERE Id=@Thread AND IsDeleted=false AND IsClosed=false", ut);
         }
 
         public static void Unsubscribe(this IDbConnection cnn, Unsubscribe u)
@@ -125,58 +91,33 @@ namespace Forum.Extensions
 
         public static void RestoreThread(this IDbConnection cnn, RestoreThread rt)
         {
-            cnn.Execute(@"UPDATE Thread SET IsDeleted=false WHERE Id=@Thread", rt);
+            cnn.Execute(@"UPDATE Thread SET IsDeleted=false WHERE Id=@Thread AND IsDeleted=true", rt);
         }
 
         public static void RestorePosts(this IDbConnection cnn, RestoreThread rt)
         {
-            cnn.Execute(@"UPDATE Post SET IsDeleted=false WHERE Thread=@Thread", rt);
+            cnn.Execute(@"UPDATE Post SET IsDeleted=false WHERE Thread=@Thread AND IsDeleted=true", rt);
         }
 
         public static void RemoveThread(this IDbConnection cnn, RemoveThread rt)
         {
-            cnn.Execute(@"UPDATE Thread SET IsDeleted=true WHERE Id=@Thread", rt);
+            cnn.Execute(@"UPDATE Thread SET IsDeleted=true WHERE Id=@Thread AND IsDeleted=false", rt);
         }
 
         public static void RemovePosts(this IDbConnection cnn, RemoveThread rt)
         {
-            cnn.Execute(@"UPDATE Post SET IsDeleted=true WHERE Thread=@Thread", rt);
+            cnn.Execute(@"UPDATE Post SET IsDeleted=true WHERE Thread=@Thread AND IsDeleted=false", rt);
         }
 
         public static void OpenThread(this IDbConnection cnn, OpenThread ot)
         {
-            cnn.Execute(@"UPDATE Thread SET IsClosed=false WHERE Id=@Thread", ot);
+            cnn.Execute(@"UPDATE Thread SET IsClosed=false WHERE Id=@Thread AND IsClosed=true", ot);
         }
 
         public static void CloseThread(this IDbConnection cnn, CloseThread ct)
         {
-            cnn.Execute(@"UPDATE Thread SET IsClosed=true WHERE Id=@Thread", ct);
+            cnn.Execute(@"UPDATE Thread SET IsClosed=true WHERE Id=@Thread AND IsClosed=false", ct);
         }
-
-        /*
-        public static ThreadModel<ForumModel, string> ReadWithForum(int id)
-        {
-            var thread = Read(id);
-
-            ThreadModel<ForumModel, string> threadWithForum = new ThreadModel<ForumModel, string>(thread);
-            threadWithForum.Forum = ForumCrud.Read(thread.Forum);
-
-            return threadWithForum;
-
-        }
-        
-        public static ThreadModel<string, UserModel> ReadWithUser(int id)
-        {
-            var thread = Read(id);
-
-            ThreadModel<string, UserModel> threadWithUser = new ThreadModel<string, UserModel>(thread);
-            threadWithUser.User = UserCrud.Read(thread.User);
-
-            return threadWithUser;
-        }
-
-        public static ThreadModel<ForumModel, UserModel> ReadWith
-        */
         
         public static int Count()
         {
