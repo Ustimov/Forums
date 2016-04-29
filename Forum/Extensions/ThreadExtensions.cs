@@ -64,19 +64,19 @@ namespace Forum.Extensions
 
         public static void LikeThread(this IDbConnection cnn, VoteThread vt)
         {
-            cnn.Execute(@"UPDATE Thread SET Likes=Likes+1 WHERE Id=@Thread AND IsDeleted=false AND IsClosed=false", vt);
+            cnn.Execute(@"UPDATE Thread SET Likes=Likes+1 WHERE Id=@Thread AND IsDeleted=false", vt);
         }
 
         public static void DislikeThread(this IDbConnection cnn, VoteThread vt)
         {
             cnn.Execute(@"UPDATE Thread SET Dislikes=Dislikes+1
-                WHERE Id=@Thread AND IsDeleted=false AND IsClosed=false", vt);
+                WHERE Id=@Thread AND IsDeleted=false", vt);
         }
 
         public static void UpdateThread(this IDbConnection cnn, UpdateThread ut)
         {
             cnn.Execute(@"UPDATE Thread SET Message=@Message, Slug=@Slug
-                WHERE Id=@Thread AND IsDeleted=false AND IsClosed=false", ut);
+                WHERE Id=@Thread AND IsDeleted=false", ut);
         }
 
         public static void Unsubscribe(this IDbConnection cnn, Unsubscribe u)
