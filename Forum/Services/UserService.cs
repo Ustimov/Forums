@@ -74,7 +74,7 @@ namespace Forum.Services
         {
             try
             {
-                return new BaseResponse<List<UserModel>>
+                return new ListFollowersResponse
                 {
                     Code = StatusCode.Ok,
                     Response = ConnectionProvider.DbConnection.ReadFollowers(lf),

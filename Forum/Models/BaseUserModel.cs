@@ -11,18 +11,18 @@ namespace Forum.Models
     public class BaseUserModel
     {
         [DataMember(Name = "about")]
-        public string About { get; set; }
+        public string About { get; set; } = "";
 
         [DataMember(Name = "email")]
         public virtual string Email { get; set; }
 
         [DataMember(Name = "followers")]
         // TODO: Correct model?
-        public List<string> Followers { get; set; } = new List<string>();
+        public IEnumerable<string> Followers { get; set; } = new List<string>();
 
         [DataMember(Name = "following")]
         // TODO: Correct model?
-        public List<string> Following { get; set; } = new List<string>();
+        public IEnumerable<string> Following { get; set; } = new List<string>();
 
         [DataMember(Name = "id")]
         public int Id { get; set; }
@@ -31,13 +31,13 @@ namespace Forum.Models
         public bool IsAnonymous { get; set; }
 
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
 
         [DataMember(Name = "subscriptions")]
         // TODO: Correct model?
-        public List<int> Subscriptions { get; set; } = new List<int>();
+        public IEnumerable<int> Subscriptions { get; set; } = new List<int>();
 
         [DataMember(Name = "username")]
-        public string Username { get; set; }
+        public string Username { get; set; } = "";
     }
 }

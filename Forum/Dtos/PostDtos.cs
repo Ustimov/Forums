@@ -11,9 +11,7 @@ namespace Forum.Dtos.Post
     [DataContract]
     public class CreatePost : PostModel<int, string, string, int?>
     {
-        // Required date, thread, message, user, forum
 
-        // Optional parent, isApproved, isHighlighted, isEdited, isSpam, isDeleted
     }
 
     [DataContract]
@@ -26,12 +24,9 @@ namespace Forum.Dtos.Post
     [DataContract]
     public class PostDetails
     {
-        // Optional
-        // Possible values: ['user', 'thread', 'forum']
         [DataMember(Name = "related")]
         public List<string> Related { get; set; }
 
-        // Required
         [DataMember(Name = "post")]
         public int Post { get; set; }
     }
@@ -46,15 +41,8 @@ namespace Forum.Dtos.Post
     [DataContract]
     public class PostListPosts : BaseList
     {
-        // Thread or Forum is required
         [DataMember(Name = "thread")]
         public int? Thread { get; set; }
-    }
-
-    [DataContract]
-    public class ListPostsResponse : BaseResponse<List<PostModel<int, string, string, int?>>>
-    {
-
     }
 
     [Route("/db/api/post/remove/")]
@@ -87,7 +75,6 @@ namespace Forum.Dtos.Post
     [DataContract]
     public class UpdatePost : BasePost
     {
-        // Required
         [DataMember(Name = "message")]
         public string Message { get; set; }
     }

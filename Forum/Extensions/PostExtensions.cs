@@ -127,9 +127,9 @@ namespace Forum.Extensions
                 });
         }
 
-        public static int Count()
+        public static int CountPosts(this IDbConnection cnn)
         {
-            return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from Post");
+            return cnn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM Post");
         }
     }
 }

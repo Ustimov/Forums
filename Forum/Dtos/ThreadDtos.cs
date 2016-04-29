@@ -42,12 +42,6 @@ namespace Forum.Dtos.Thread
         public List<string> Related { get; set; }
     }
 
-    [DataContract]
-    public class DetailsResponse : BaseResponse<ThreadModel<string, string>>
-    {
-
-    }
-
     [Route("/db/api/thread/list/")]
     [DataContract]
     public class ThreadListThreads : BaseList
@@ -55,12 +49,6 @@ namespace Forum.Dtos.Thread
         // Required user or forum
         [DataMember(Name = "user")]
         public string User { get; set; }
-    }
-
-    [DataContract]
-    public class ListThreadsResponse : BaseResponse<List<ThreadModel<string, string>>>
-    {
-
     }
 
     [Route("/db/api/thread/listPosts/")]
@@ -73,12 +61,6 @@ namespace Forum.Dtos.Thread
 
         [DataMember(Name = "sort")]
         public string Sort { get; set; } = "flat";
-    }
-
-    [DataContract]
-    public class ListsPostsResponse : BaseResponse<List<PostModel<int, string, string, int?>>>
-    {
-
     }
 
     [Route("/db/api/thread/open/")]

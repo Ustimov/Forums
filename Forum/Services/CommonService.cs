@@ -19,30 +19,31 @@ namespace Forum.Services
             ConnectionProvider.DbConnection.Execute("delete from Follower");
             ConnectionProvider.DbConnection.Execute("delete from User");
 
-            return new BaseResponse<string> { Code = StatusCode.Ok, Response = "Ok" };
+            return new ClearResponse { Code = StatusCode.Ok, Response = "Ok" };
         }
 
-        public object Get(Status request)
+        public object Get(Status s)
         {
             try
             {
-                return new BaseResponse<StatusResponseModel>
+                var cnn = ConnectionProvider.DbConnection;
+
+                return new StatusResponse
                 {
                     Code = StatusCode.Ok,
                     Response = new StatusResponseModel
                     {
-                        User = UserExtensions.Count(),
-                        Thread = ThreadExtensions.Count(),
-                        Forum = ForumExtensions.Count(),
-                        Post = PostExtensions.Count(),
+                        User = cnn.CountUsers(),
+                        Thread = cnn.CountThreads(),
+                        Forum = cnn.CountForums(),
+                        Post = cnn.CountPosts(),
                     },
                 };
             }
             catch (Exception e)
             {
-                throw;
+                return new ErrorResponse { Code = StatusCode.UndefinedError, Response = e.Message };
             }
-
         }
     }
 } 

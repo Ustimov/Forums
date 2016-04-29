@@ -20,9 +20,9 @@ namespace Forum.Extensions
                 new { ShortName = shortName }).FirstOrDefault();
         }
 
-        public static int Count()
+        public static int CountForums(this IDbConnection cnn)
         {
-            return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from Forum");
+            return cnn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM Forum");
         }
     }
 }

@@ -124,14 +124,14 @@ namespace Forum.Services
             }
         }
 
-        public object Get(ForumListUsers request)
+        public object Get(ForumListUsers flu)
         {
             try
             {
                 return new ForumListUsersResponse
                 {
                     Code = StatusCode.Ok,
-                    Response = ConnectionProvider.DbConnection.ReadAllUsers(request),
+                    Response = ConnectionProvider.DbConnection.ReadAllUsers(flu),
                 };
             }
             catch (Exception e)

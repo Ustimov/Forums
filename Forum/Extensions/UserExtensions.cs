@@ -29,7 +29,7 @@ namespace Forum.Extensions
         public static UserModel ReadUser(this IDbConnection cnn, string email)
         {
             var user = cnn.Query<UserModel>(
-                @"select * from User where Email = @Email",
+                @"SELECT Id, About, Email, IsAnonymous, Name, Username FROM User WHERE Email=@Email",
                 new { Email = email }).FirstOrDefault();
             
             if (user == null)
@@ -41,12 +41,16 @@ namespace Forum.Extensions
                 user.About = user.Name = user.Username = null;
             }
 
-            // TODO: To additional method
-            user.Followers = ReadFollowerEmails(user.Email);
-            user.Following = ReadFollowingEmails(user.Email);
-            user.Subscriptions = ReadSubscriptions(user.Email);
+            cnn.ReadFollowersAndSubscriptions(user);
 
             return user;
+        }
+
+        private static void ReadFollowersAndSubscriptions(this IDbConnection cnn, UserModel um)
+        {
+            um.Followers = cnn.ReadFollowerEmails(um.Email);
+            um.Following = cnn.ReadFollowingEmails(um.Email);
+            um.Subscriptions = cnn.ReadSubscriptions(um.Email);
         }
 
         public static void UpdateUser(this IDbConnection cnn, UserModel um)
@@ -54,9 +58,9 @@ namespace Forum.Extensions
             cnn.Execute(@"UPDATE User SET About=@About, Name=@Name WHERE Email=@Email", um);
         }
 
-        public static List<UserModel> ReadFollowers(this IDbConnection cnn, ListFollowers request)
+        public static IEnumerable<UserModel> ReadFollowers(this IDbConnection cnn, ListFollowers request)
         {
-            var users = ConnectionProvider.DbConnection.Query<UserModel>(
+            var users = cnn.Query<UserModel>(
                 @"select * from Follower f left join User u on f.Follower=u.Email
                 where f.Followee=@Email" + (request.SinceId == null ? string.Empty : " and u.Id >= @SinceId")
                 + " order by u.Name " + request.Order,
@@ -64,15 +68,13 @@ namespace Forum.Extensions
 
             foreach (var user in users)
             {
-                user.Followers = ReadFollowerEmails(user.Email);
-                user.Following = ReadFollowingEmails(user.Email);
-                user.Subscriptions = ReadSubscriptions(user.Email);
+                cnn.ReadFollowersAndSubscriptions(user);
             }
 
-            return users.ToList();
+            return users;
         }
 
-        public static List<UserModel> ReadFollowing(this DbConnection cnn, ListFollowing request)
+        public static IEnumerable<UserModel> ReadFollowing(this DbConnection cnn, ListFollowing request)
         {
             var users = cnn.Query<UserModel>(
                 @"select * from Follower f left join User u on f.Followee=u.Email
@@ -82,38 +84,28 @@ namespace Forum.Extensions
 
             foreach (var user in users)
             {
-                user.Followers = ReadFollowerEmails(user.Email);
-                user.Following = ReadFollowingEmails(user.Email);
-                user.Subscriptions = ReadSubscriptions(user.Email);
+                cnn.ReadFollowersAndSubscriptions(user);
             }
 
-            return users.ToList();
+            return users;
         }
 
-        private static List<string> ReadFollowerEmails(string email)
+        private static IEnumerable<string> ReadFollowerEmails(this IDbConnection cnn, string email)
         {
-            var emails = ConnectionProvider.DbConnection.Query<string>(
-                @"select Follower from Follower where Followee=@Email", new { Email = email });
-
-            return emails.ToList();
+            return cnn.Query<string>(@"SELECT Follower FROM Follower WHERE Followee=@Email", new { Email = email }); ;
         }
 
-        private static List<string> ReadFollowingEmails(string email)
+        private static IEnumerable<string> ReadFollowingEmails(this IDbConnection cnn, string email)
         {
-            var emails = ConnectionProvider.DbConnection.Query<string>(
-                @"select Followee from Follower where Follower=@Email", new { Email = email });
-
-            return emails.ToList();
+            return cnn.Query<string>(@"SELECT Followee FROM Follower WHERE Follower=@Email", new { Email = email });
         }
 
-        private static List<int> ReadSubscriptions(string email)
+        private static IEnumerable<int> ReadSubscriptions(this IDbConnection cnn, string email)
         {
-            return ConnectionProvider.DbConnection.Query<int>(
-                @"select Thread from Subscribe where User=@Email", new { Email = email }).
-                ToList();
+            return cnn.Query<int>(@"SELECT Thread FROM Subscribe WHERE User=@Email", new { Email = email });
         }
 
-        public static List<UserModel> ReadAllUsers(this IDbConnection cnn, ForumListUsers request)
+        public static IEnumerable<UserModel> ReadAllUsers(this IDbConnection cnn, ForumListUsers request)
         {
             var users = cnn.Query<UserModel>(
                 @"select distinct u.* from Post p left join User u on p.User = u.Email where p.Forum=@Forum" +
@@ -125,7 +117,7 @@ namespace Forum.Extensions
                     Forum = request.Forum,
                     SinceId = request.SinceId,
                     Limit = request.Limit,
-                }).Distinct().AsList();
+                }).Distinct();
 
             foreach (var user in users)
             {
@@ -133,9 +125,8 @@ namespace Forum.Extensions
                 {
                     user.About = user.Name = user.Username = null;
                 }
-                user.Followers = ReadFollowerEmails(user.Email);
-                user.Following = ReadFollowingEmails(user.Email);
-                user.Subscriptions = ReadSubscriptions(user.Email);
+
+                cnn.ReadFollowersAndSubscriptions(user);
             }
 
             return users;
@@ -146,14 +137,15 @@ namespace Forum.Extensions
             cnn.Execute(@"DELETE FROM Follower WHERE Follower=@Follower AND Followee=@Followee", u);
         }
 
-        public static IEnumerable<PostModel<int, string, string, int?>> UserListPosts(this IDbConnection cnn, UserListPosts request)
+        public static IEnumerable<PostModel<int, string, string, int?>> UserListPosts(
+            this IDbConnection cnn, UserListPosts request)
         {
             var sql = "select * from Post where User=@User" +
                 (request.Since == null ? string.Empty : " and Date >= @Since") +
                 (request.Order == null ? string.Empty : " order by Date " + request.Order) +
                 (request.Limit == null ? string.Empty : " limit @Limit");
 
-            var posts = ConnectionProvider.DbConnection.Query<PostModel<int, string, string, int?>>(
+            var posts = cnn.Query<PostModel<int, string, string, int?>>(
                 sql,
                 new
                 {
@@ -165,16 +157,14 @@ namespace Forum.Extensions
             return posts;
         }
 
-        public static void Follow(this IDbConnection cnn, Follow request)
+        public static void Follow(this IDbConnection cnn, Follow f)
         {
-            cnn.Execute(
-                @"insert into Follower (Follower, Followee) values(@Follower, @Followee)",
-                new { Follower = request.Follower, Followee = request.Followee });
+            cnn.Execute(@"INSERT INTO Follower (Follower, Followee) VALUES (@Follower, @Followee)", f);
         }
 
-        public static int Count()
+        public static int CountUsers(this IDbConnection cnn)
         {
-            return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from User");
+            return cnn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM User");
         }
     }
 }

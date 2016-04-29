@@ -119,9 +119,9 @@ namespace Forum.Extensions
             cnn.Execute(@"UPDATE Thread SET IsClosed=true WHERE Id=@Thread AND IsClosed=false", ct);
         }
         
-        public static int Count()
+        public static int CountThreads(this IDbConnection cnn)
         {
-            return ConnectionProvider.DbConnection.ExecuteScalar<int>(@"select count(*) from Thread");
+            return cnn.ExecuteScalar<int>(@"SELECT COUNT(*) FROM Thread");
         }
     }
 }

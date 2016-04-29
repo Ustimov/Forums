@@ -16,28 +16,21 @@ namespace Forum.Dtos.Base
 
     public class BaseList
     {
-        // Optional
         [DataMember(Name = "since")]
         public DateTime? Since { get; set; }
 
         [DataMember(Name = "since_id")]
         public int? SinceId { get; set; }
 
-        // Optional
         [DataMember(Name = "limit")]
         public int? Limit { get; set; }
 
-        // Optional
-        // Possible values: ['desc', 'asc']. Default: 'desc'
         [DataMember(Name = "order")]
         public string Order { get; set; } = "desc";
 
-        // Optional
         [DataMember(Name = "related")]
         public List<string> Related { get; set; }
 
-        // TODO: also for user
-        // Required
         [DataMember(Name = "forum")]
         public string Forum { get; set; }
     }
@@ -45,7 +38,6 @@ namespace Forum.Dtos.Base
     [DataContract]
     public class BasePost
     {
-        // Required
         [DataMember(Name = "post")]
         public int Post { get; set; }
     }
@@ -53,7 +45,6 @@ namespace Forum.Dtos.Base
     [DataContract]
     public class BaseUser
     {
-        // Required
         [DataMember(Name = "user")]
         public string Email { get; set; }
     }

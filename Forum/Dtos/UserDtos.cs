@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 using ServiceStack.ServiceHost;
 using Forum.Dtos.Base;
@@ -56,7 +55,7 @@ namespace Forum.Dtos.User
     }
 
     [DataContract]
-    public class ListFollowersResponse : BaseResponse<List<UserModel>>
+    public class ListFollowersResponse : BaseResponse<IEnumerable<UserModel>>
     {
 
     }
@@ -70,7 +69,7 @@ namespace Forum.Dtos.User
     }
 
     [DataContract]
-    public class ListFollowingResponse : BaseResponse<List<UserModel>>
+    public class ListFollowingResponse : BaseResponse<IEnumerable<UserModel>>
     {
 
     }
@@ -81,12 +80,6 @@ namespace Forum.Dtos.User
     {
         [DataMember(Name = "user")]
         public string User { get; set; }
-    }
-
-    [DataContract]
-    public class ListPostsResponse : BaseResponse<List<PostModel<int, string, string, int?>>>
-    {
-
     }
 
     [Route("/db/api/user/unfollow/")]
