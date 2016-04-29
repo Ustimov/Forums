@@ -31,7 +31,8 @@ namespace Forum.Extensions
         public static ThreadModel<object, object> ReadThread(this IDbConnection cnn, int? id)
         {
             var thread = cnn.Query<ThreadModel<object, object>>(
-                @"select * from Thread where Id = @Id", new { Id = id }).FirstOrDefault();
+                @"SELECT Id, Forum, Title, IsClosed, User, Date, Message, Slug, IsDeleted, Likes, Dislikes
+                FROM Thread WHERE Id = @Id", new { Id = id }).FirstOrDefault();
 
             if (thread != null)
             {
